@@ -67,7 +67,7 @@
 
 
 <script setup>
-const HTTPS_MPESA = 'https://4b02aee37622ed.lhr.life/api'
+const HTTPS_MPESA = 'https://233bb7379607c5.lhr.life/api'
 import { defineProps, defineEmits,ref } from 'vue';
 import axios from 'axios';
 
@@ -75,7 +75,7 @@ import axios from 'axios';
 const props = defineProps({
     isOpen: Boolean,
     billAmount: Number,
-    orderNo: Number, // Ensure this is defined
+    orderNo: String, // Ensure this is defined
     paymentMethod: String,
     title: String // Ensure this is defined
 });
@@ -83,6 +83,7 @@ const props = defineProps({
 const emit = defineEmits(['close', 'paymentSuccess']);
 
 const numbers = ref([...Array(10).keys()].map(i => ({ id: i, value: i }))); // Generates numbers 0-9
+const alertMessage = ref('');
 const amount = ref(props.billAmount || '');
 
 
@@ -121,6 +122,13 @@ const removeLastDigit = () => {
 
 const clearInput = () => {
     amount.value = "";
+};
+
+const showAlert = (message) => {
+    alertMessage.value = message;
+    setTimeout(() => {
+        alertMessage.value = "";
+    }, 5000);
 };
 
 

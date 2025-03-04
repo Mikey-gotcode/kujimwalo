@@ -82,7 +82,7 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'paymentSuccess']);
 
-const amount = ref(props.billAmount || '');
+const amount = ref(props.billAmount || 0);
 const alertMessage = ref('');
 const numbers = ref([...Array(10).keys()].map(i => ({ id: i, value: i }))); // Generates numbers 0-9
 
@@ -110,8 +110,8 @@ const submitForm = async () => {
 
     try {
         const response = await axios.post(`${api.baseURL}/orders/${props.orderID}/process-payment`, {
-            amount: props.billAmount,
-            account_number:'12345'
+            amount:amount.value,
+            payment_method:props.paymentMethod
         });
 
         if (response.data.success) {

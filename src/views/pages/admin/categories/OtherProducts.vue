@@ -1,16 +1,9 @@
 <template>
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-    <div
-      v-for="product in products"
-      :key="product.id"
-      class="bg-white rounded-lg shadow-md transition hover:shadow-lg p-4"
-    >
+    <div v-for="product in products" :key="product.id"
+      class="bg-white rounded-lg shadow-md transition hover:shadow-lg p-4">
       <div class="relative">
-        <img
-          :src="product.image"
-          :alt="product.name"
-          class="w-full h-48 object-cover rounded-lg"
-        />
+        <img :src="product.image" :alt="product.name" class="w-full h-48 object-cover rounded-lg" />
       </div>
 
       <div class="p-4 min-h-[400px]">
@@ -27,17 +20,13 @@
         </div>
 
         <div class="flex gap-2 mt-4">
-          <button
-            @click="editProduct(product)"
-            class="w-full bg-blue-500 hover:bg-yellow-600 text-white font-semibold py-2 rounded-lg shadow-md transition border border-red-500 hover:cursor-pointer"
-          >
+          <button @click="editProduct(product)"
+            class="w-full bg-blue-500 hover:bg-yellow-600 text-white font-semibold py-2 rounded-lg shadow-md transition border border-red-500 hover:cursor-pointer">
             Edit
           </button>
 
-          <button
-            @click="confirmDelete(product.id)"
-            class="w-full bg-red-500 hover:bg-red-700 text-white font-semibold py-2 rounded-lg shadow-md transition border border-gray-500 hover:cursor-pointer"
-          >
+          <button @click="confirmDelete(product.id)"
+            class="w-full bg-red-500 hover:bg-red-700 text-white font-semibold py-2 rounded-lg shadow-md transition border border-gray-500 hover:cursor-pointer">
             Delete
           </button>
         </div>
@@ -45,32 +34,23 @@
     </div>
   </div>
 
-  <div
-    v-if="selectedProduct"
-    class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
-  >
+  <div v-if="selectedProduct" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
     <div class="bg-white p-6 rounded-lg shadow-lg w-96">
       <h2 class="text-lg font-bold mb-4">Edit Product</h2>
       <label class="block mb-2">Name</label>
       <input v-model="selectedProduct.name" class="w-full p-2 border rounded mb-3" type="text" />
       <label class="block mb-2">Price</label>
       <input v-model="selectedProduct.price" class="w-full p-2 border rounded mb-3" type="number" step="0.01" />
-      <label class="block mb-2">Image URL</label>
-      <input v-model="selectedProduct.image" class="w-full p-2 border rounded mb-3" type="text" />
+      <label class="block mb-2">Product Image</label>
+      <input type="file" accept="image/*" @change="handleImageUpload" class="w-full p-2 border rounded mb-3" />
       <label class="block mb-2">Stock Quantity</label>
       <input v-model="selectedProduct.stock_quantity" class="w-full p-2 border rounded mb-3" type="number" />
 
       <div class="flex justify-between mt-4">
-        <button
-          @click="saveChanges"
-          class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
-        >
+        <button @click="saveChanges" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
           Save Changes
         </button>
-        <button
-          @click="selectedProduct = null"
-          class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
-        >
+        <button @click="selectedProduct = null" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
           Cancel
         </button>
       </div>
@@ -78,13 +58,12 @@
   </div>
 
   <!-- Success Message -->
-  <div
-    v-if="successMessage"
-    class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg transition-opacity duration-500"
-  >
+  <div v-if="successMessage"
+    class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg transition-opacity duration-500">
     {{ successMessage }}
   </div>
 </template>
+
 
 <script setup>
 import { ref, onBeforeMount, watchEffect, defineProps } from "vue";
@@ -99,33 +78,65 @@ const props = defineProps({
 const products = ref([]);
 const selectedProduct = ref(null);
 const successMessage = ref("");
+const imageFile = ref(null); // Store the image file
 
 const isInStock = (product) => product.stock_quantity > 0;
+
+const handleImageUpload = (event) => {
+  const file = event.target.files[0];
+  if (file && file.size <= 5 * 1024 * 1024) { // Ensure file is <= 5MB
+    imageFile.value = file;
+  } else {
+    alert("File size exceeds 5MB limit.");
+  }
+};
 
 const editProduct = (product) => {
   selectedProduct.value = { ...product };
 };
 
 const saveChanges = async () => {
+  if (
+    !selectedProduct.value.name ||
+    !selectedProduct.value.price ||
+    !selectedProduct.value.category_id ||
+    !selectedProduct.value.stock_quantity
+  ) {
+    alert("All fields are required.");
+    return;
+  }
+
   try {
-    console.log("category id:",selectedProduct.value.category_id)
-    await axios.patch(`${api.baseURL}/products/${selectedProduct.value.category_id}`, {
-      name: selectedProduct.value.name,
-      price: selectedProduct.value.price,
-      category_id:selectedProduct.value.category_id,
-      image: selectedProduct.value.image || null,
-      stock_quantity: selectedProduct.value.stock_quantity,
-    });
+    const formData = new FormData();
+
+    formData.append("name", selectedProduct.value.name);
+    formData.append("price", parseFloat(selectedProduct.value.price));  // Ensure price is a number
+    formData.append("category_id", parseInt(selectedProduct.value.category_id));  // Ensure category_id is an integer
+    formData.append("stock_quantity", parseInt(selectedProduct.value.stock_quantity)); // Ensure stock_quantity is an integer
+
+    if (imageFile.value) {
+      formData.append("image", imageFile.value);
+    }
+
+    // Debugging: Verify formData types
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}:`, value, `(Type: ${typeof value})`);
+    }
+
+    await axios.put(`${api.baseURL}/products/${selectedProduct.value.id}`, formData, );
 
     const index = products.value.findIndex((p) => p.id === selectedProduct.value.id);
     if (index !== -1) {
       products.value[index] = { ...products.value[index], ...selectedProduct.value };
     }
     selectedProduct.value = null;
+    showSuccessMessage("Product updated successfully!");
   } catch (error) {
     console.error("Error updating product:", error);
   }
 };
+
+
 
 // Delete Product
 const confirmDelete = async (productId) => {

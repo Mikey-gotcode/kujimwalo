@@ -1,14 +1,14 @@
 <template>
   <div class="p-4 md:p-6">
     <!-- Product Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       <div
         v-for="product in products"
         :key="product.id"
         class="bg-white rounded-lg shadow-md overflow-hidden transition hover:shadow-lg p-3 md:p-4"
       >
         <div class="relative">
-          <img :src="product.image" :alt="product.name" class="w-full h-40 sm:h-48 object-cover rounded-lg" />
+          <img :src="product.image" :alt="product.name" class="w-full aspect-[4/3] object-cover rounded-lg" />
         </div>
         <div class="p-3 md:p-4">
           <h3 class="text-base md:text-lg font-semibold text-gray-800">{{ product.name }}</h3>
@@ -24,7 +24,7 @@
             <div class="flex items-center space-x-3">
               <button
                 @click="decreaseQuantity(product)"
-                class="bg-blue-500 px-3 py-1 rounded-md text-lg font-bold hover:bg-gray-600 text-white transition disabled:opacity-50"
+                class="bg-blue-500 px-3 py-2 sm:px-4 sm:py-2 rounded-md text-base font-bold hover:bg-gray-600 text-white transition disabled:opacity-50"
                 :disabled="quantities[product.id] === 0"
               >
                 -
@@ -32,13 +32,13 @@
               <span class="text-lg font-semibold">{{ quantities[product.id] }}</span>
               <button
                 @click="increaseQuantity(product)"
-                class="bg-blue-500 px-3 py-1 rounded-md text-lg font-bold hover:bg-gray-600 text-white transition"
+                class="bg-blue-500 px-3 py-2 sm:px-4 sm:py-2 rounded-md text-base font-bold hover:bg-gray-600 text-white transition"
               >
                 +
               </button>
             </div>
           </div>
-          <button @click="addToCart(product)" class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg shadow-md transition">
+          <button @click="addToCart(product)" class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 sm:py-4 rounded-lg shadow-md transition">
             Add to Cart
           </button>
         </div>
@@ -49,31 +49,32 @@
     <button 
       v-if="cart.length" 
       @click="toggleCart" 
-      class="fixed bottom-5 right-5 md:right-10 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 md:py-4 md:px-5 rounded-lg shadow-lg transition"
+      class="fixed bottom-5 right-5 md:right-10 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 sm:py-4 px-4 sm:px-5 rounded-lg shadow-lg transition text-sm sm:text-base"
     >
       View Cart ({{ cart.length }})
     </button>
 
     <!-- Teleported Cart -->
     <Teleport to="body">
-      <div v-if="showCart" class="absolute top-5 right-5 w-72 md:w-96 bg-white rounded-lg shadow-lg p-4 border border-gray-200">
+      <div v-if="showCart" class="fixed top-5 right-5 w-11/12 sm:w-96 bg-white rounded-lg shadow-lg p-4 border border-gray-200">
         <div class="flex justify-between items-center">
-          <h2 class="text-lg md:text-xl font-bold">Cart</h2>
+          <h2 class="text-lg sm:text-xl font-bold">Cart</h2>
           <button @click="showCart = false" class="text-blue-500 hover:underline">Close</button>
         </div>
         <ul>
           <li v-for="item in cart" :key="item.id" class="flex justify-between items-center mt-3">
-            <span class="text-sm md:text-base">{{ item.name }} ({{ item.quantity }})</span>
-            <button @click="removeFromCart(item.id)" class="text-blue-500 hover:underline text-sm md:text-base">Remove</button>
+            <span class="text-sm sm:text-base">{{ item.name }} ({{ item.quantity }})</span>
+            <button @click="removeFromCart(item.id)" class="text-blue-500 hover:underline text-sm sm:text-base">Remove</button>
           </li>
         </ul>
-        <button @click="checkout" class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 md:py-3 rounded-lg shadow-md transition">
+        <button @click="checkout" class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 sm:py-3 rounded-lg shadow-md transition">
           Proceed to Checkout
         </button>
       </div>
     </Teleport>
   </div>
 </template>
+
 
 
 <script setup>
@@ -117,6 +118,7 @@ const addToCart = (product) => {
   } else {
     cart.value.push({ ...product, quantity: quantities.value[product.id] });
     cartStore.setCartItems(cart.value,authStore.token)
+    //console.log("cart values",cart.value)
   }
 };
 

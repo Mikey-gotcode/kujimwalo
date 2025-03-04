@@ -2,34 +2,30 @@
   <ProductNav /> 
   <div class="page-content py-8">
     <div class="container mx-auto px-4">
-      <div class="flex flex-row lg:flex-row gap-6">
-        <div class="flex">
+      <div class="flex flex-col lg:flex-row gap-6">
+        <div class="lg:w-1/4 w-full">
           <CategoriesSide />
         </div>
 
-        <div class="flex-1">
-          <div class="bg-white shadow-md rounded-lg p-6">
+        <div class="lg:w-3/4 w-full">
+          <div class="bg-white shadow-md rounded-lg p-6 relative">
 
-               <!-- View Cart Button (Fixed at Bottom) -->
-                <button 
-                  v-if="cart.length" 
-                  @click="toggleCart" 
-                  class="fixed bottom-5 right-5 md:right-10 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 md:py-4 md:px-5 rounded-lg shadow-lg transition"
-                >
-                  View Cart ({{ cart.length }})
-                </button>
-
-
-
-
+            <!-- View Cart Button (Fixed at Bottom) -->
+            <button 
+              v-if="cart.length" 
+              @click="toggleCart" 
+              class="fixed bottom-5 right-5 md:right-10 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 md:py-4 md:px-5 rounded-lg shadow-lg transition"
+            >
+              View Cart ({{ cart.length }})
+            </button>
 
             <div class="border-b pb-4 mb-4">
               <h3 class="text-xl font-semibold">Products</h3>
             </div>
             
             <!-- Tab Navigation -->
-            <div>
-              <ul class="flex border-b">
+            <div class="overflow-x-auto">
+              <ul class="flex border-b whitespace-nowrap">
                 <li 
                   v-for="tab in tabs" 
                   :key="tab.id"
@@ -47,29 +43,30 @@
               <OtherProducts v-if="selectedTab === tab.id" :activeTab="currentTab"  ref="hDrinkNumb"/>
             </div>
           </div>
+          
           <!-- Teleported Cart -->
-    <Teleport to="body">
-      <div v-if="showCart" class="fixed top-5 right-5 w-72 md:w-96 bg-white rounded-lg shadow-lg p-4 border border-gray-200">
-        <div class="flex justify-between items-center">
-          <h2 class="text-lg md:text-xl font-bold">Cart</h2>
-          <button @click="showCart = false" class="text-blue-500 hover:underline">Close</button>
-        </div>
-        <ul>
-          <li v-for="item in cart" :key="item.id" class="flex justify-between items-center mt-3">
-            <span class="text-sm md:text-base">{{ item.name }} ({{ item.quantity }})</span>
-            <button @click="removeFromCart(item.id)" class="text-blue-500 hover:underline text-sm md:text-base">Remove</button>
-          </li>
-        </ul>
-        <button @click="checkout" class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 md:py-3 rounded-lg shadow-md transition">
-          Proceed to Checkout
-        </button>
-      </div>
-    </Teleport>
+          <Teleport to="body">
+            <div v-if="showCart" class="fixed top-5 right-5 w-11/12 md:w-96 bg-white rounded-lg shadow-lg p-4 border border-gray-200">
+              <div class="flex justify-between items-center">
+                <h2 class="text-lg md:text-xl font-bold">Cart</h2>
+                <button @click="showCart = false" class="text-blue-500 hover:underline">Close</button>
+              </div>
+              <ul>
+                <li v-for="item in cart" :key="item.id" class="flex justify-between items-center mt-3">
+                  <span class="text-sm md:text-base">{{ item.name }} ({{ item.quantity }})</span>
+                  <button @click="removeFromCart(item.id)" class="text-blue-500 hover:underline text-sm md:text-base">Remove</button>
+                </li>
+              </ul>
+              <button @click="checkout" class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 md:py-3 rounded-lg shadow-md transition">
+                Proceed to Checkout
+              </button>
+            </div>
+          </Teleport>
           
           <!-- Pagination -->
-          <div class="mt-6 flex justify-between items-center">
+          <div class="mt-6 flex flex-col sm:flex-row justify-between items-center">
             <p class="text-gray-700">Page 1 of 2</p>
-            <ul class="flex space-x-2">
+            <ul class="flex space-x-2 mt-2 sm:mt-0">
               <li class="bg-blue-600 text-white px-3 py-1 rounded-md">1</li>
               <li class="bg-gray-200 hover:bg-blue-600 hover:text-white px-3 py-1 rounded-md cursor-pointer">2</li>
               <li class="bg-gray-200 hover:bg-blue-600 hover:text-white px-3 py-1 rounded-md cursor-pointer">

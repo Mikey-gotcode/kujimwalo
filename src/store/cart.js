@@ -7,7 +7,7 @@ export const useCartStore = defineStore('cart', {
     state:()=>({
         user: JSON.parse(localStorage.getItem('user')) || null,
         token: localStorage.getItem('token') || null,
-        cartItems: localStorage.getItem('cartItems') || null
+        cartItems: localStorage.getItem('cartItems') || []
 
     }),
     getters:{
@@ -23,7 +23,7 @@ export const useCartStore = defineStore('cart', {
           localStorage.setItem('token', token);
         },
         clearCartItems() {
-            this.cartItems = null;
+            this.cartItems = [];
             this.token = null;
             localStorage.removeItem('cartItems');
             localStorage.removeItem('token');
