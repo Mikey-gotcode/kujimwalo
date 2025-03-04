@@ -105,19 +105,6 @@ import OtherProducts from '../admin/categories/OtherProducts.vue';
 import AddProduct from '../admin/categories/AddProducts.vue' 
 import AddCategory from '../admin/categories/AddCategory.vue' 
 
-// const ruffN =ref(7) 
-
-// const categoryMap = {
-// vodka: 1,
-// gin: 2,
-// spirits: 3,
-// whiskey: 4,
-// beer: 9,
-// cigarettes: 6,
-// soft: 7,
-// liquer: 8
-// };
-
 
 
 

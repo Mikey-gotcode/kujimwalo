@@ -81,6 +81,7 @@ import { ref, onBeforeMount, watchEffect, defineProps, nextTick } from "vue";
 import axios from "axios";
 import api from "../../../../api";
 import { useAuthStore } from "../../../../store/auth";
+import {useCartStore} from "../../../../store/cart"
 
 const props = defineProps({
   activeTab: Number,
@@ -92,6 +93,7 @@ const cart = ref([]);
 const quantities = ref({});
 const showCart = ref(false); // Controls cart visibility
 const authStore = useAuthStore()
+const cartStore = useCartStore()
 
 
 const isInStock = (product) => product.stock_quantity > 0;
@@ -114,6 +116,7 @@ const addToCart = (product) => {
     existingItem.quantity = quantities.value[product.id];
   } else {
     cart.value.push({ ...product, quantity: quantities.value[product.id] });
+    cartStore.setCartItems(cart.value,authStore.token)
   }
 };
 

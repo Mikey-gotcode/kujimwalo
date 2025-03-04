@@ -1,7 +1,18 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, defineProps } from 'vue';
 import axios from 'axios';
 import api from '../../../api'
+import KeyPad from '../../../components/KeyPad.vue';
+import PreviewMpesa from '../../../components/PreviewMpesa.vue';
+import { useAuthStore } from '../../../store/auth';
+
+const props = defineProps({
+  isOpen:Boolean,
+  activeTab: String,
+  required: true,
+});
+
+const authStore = useAuthStore()
 
 const orders = ref([]);
 const selectedStatus = ref('All orders');
@@ -9,18 +20,39 @@ const loading = ref(true);
 const error = ref(null);
 let intervalId = null;
 const showPaymentOptions = ref(null); // Track which order is processing payment
+const selectedOrder = ref(null);
+const selectedMethod = ref('');
+const selectedBill = ref(0);
 
 // Fetch orders from API
 const fetchOrders = async () => {
   try {
     const response = await axios.get(`${api.baseURL}/orders`);
-    orders.value = response.data;
+    const allOrders = response.data;
+    console.log("order data:",allOrders)
+    orders.value  = props.activeTab ? allOrders.filter((p)=>p.status === props.activeTab) : allOrders
   } catch (err) {
     error.value = 'Failed to fetch orders';
   } finally {
     loading.value = false;
   }
 };
+
+const showCashModal = ref({});
+const showMpesaModal = ref({});
+
+const openKeypad = (id, method) => {
+  showCashModal.value = { [id]: !showCashModal.value[id] };
+  selectedOrder.value = id;
+  selectedMethod.value = method;
+};
+
+const openMpesaKeyPad = (id, method) => {
+  showMpesaModal.value = { [id]: !showMpesaModal.value[id] };
+  selectedOrder.value = id;
+  selectedMethod.value = method;
+};
+
 
 onMounted(() => {
   fetchOrders(); // Fetch initially
@@ -34,9 +66,7 @@ onUnmounted(() => {
 
 // Filter orders dynamically
 const filteredOrders = () => {
-  return orders.value.filter(order => 
-    selectedStatus.value === 'All orders' || order.status === selectedStatus.value
-  );
+  return orders.value.filter(o => selectedStatus.value === 'All orders' || o.status === selectedStatus.value);
 };
 
 const cancelOrder = async (id) => {
@@ -64,7 +94,7 @@ const togglePaymentOptions = (id) => {
 
 <template>
   <section class="bg-white dark:bg-gray-900 py-8 md:py-16">
-    <div class="max-w-screen-xl mx-auto px-4">
+    <div  class="max-w-screen-xl mx-auto px-4">
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-semibold text-gray-900 dark:text-white">My Orders</h2>
         <select v-model="selectedStatus" class="border border-gray-300 dark:border-gray-700 p-2 rounded-md">
@@ -124,16 +154,46 @@ const togglePaymentOptions = (id) => {
                   Cancel
                 </button>
                 <button 
+                  @click="openKeypad(order.id,'cash')"
                   class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md"
                 >
                   Cash Payment
                 </button>
                 <button 
+                  @click="openMpesaKeyPad(order.id,'mpesa')"
                   class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md"
                 >
                   MPESA Payment
                 </button>
               </div>
+              <!-- cash modal -->
+              <KeyPad 
+              v-if="showCashModal[order.id]" 
+              :isOpen="showCashModal[order.id]" 
+              :billAmount="selectedBill"
+              :orderID="selectedOrder"
+              :paymentMethod="selectedMethod"
+              title="Keypad" 
+              @close="showCashModal[order.id] = false"
+              @paymentSuccess="fetchOrders"
+            />
+
+            <PreviewMpesa
+              v-else-if="showMpesaModal[order.id]"
+              :isOpen="showMpesaModal[order.id]"
+              :billAmount="order.total_price"
+              :orderNo="authStore.user.phone"
+              :paymentMethod="selectedMethod"
+              title="PreviewMpesa"
+              @close="showMpesaModal[order.id]=false"
+              @paymentSuccess="fetchOrders"
+            
+            />
+
+
+              <!-- mpesa modal -->
+
+
             </div>
           </div>
         </div>

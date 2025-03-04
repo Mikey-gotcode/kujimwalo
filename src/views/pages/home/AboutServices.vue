@@ -13,8 +13,7 @@
             class="w-40 h-40 sm:w-48 sm:h-48 md:w-64 md:h-64 lg:w-72 lg:h-72 object-cover rounded-full shadow-lgfloat-left"
           />
             <p class="mt-4 text-gray-600 text-left">
-              We are dedicated to providing top-notch services with a focus on quality and customer satisfaction. 
-              Our team is committed to excellence, ensuring that every client gets the best experience possible.
+              Come ujinice kujinyce. Saka kaa fom, bonga na mdenge na usituachie deni 
             </p>
           </div>
         </div>
