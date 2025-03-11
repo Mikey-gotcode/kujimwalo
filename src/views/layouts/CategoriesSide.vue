@@ -26,7 +26,7 @@ const menuItems = ref({
     {
       label: "Settings",
       icon: "../../assets/icons/bottle-of-martini-martini-alcohol-drink-svgrepo-com.svg",
-      link: "/products"
+      link: "/admin/settings"
     }
   ]
 })

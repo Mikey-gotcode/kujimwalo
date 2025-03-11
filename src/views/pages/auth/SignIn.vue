@@ -19,6 +19,10 @@
                 <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
                 <input v-model="form.password" type="password" id="password" placeholder="••••••••" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
               </div>
+              <div v-if="errorMessage" class="text-red-500 text-sm">
+                    {{ errorMessage }}
+                  </div>
+
               <div class="flex items-center justify-between">
                 <div class="flex items-start">
                   <div class="flex items-center h-5">
@@ -44,7 +48,7 @@
   </template>
   
   <script setup>
-import { reactive } from 'vue';
+import { reactive ,ref } from 'vue';
 import { useAuthStore } from '../../../store/auth';
 import axios from 'axios';
 import api from "../../../api"; // Import the API configuration
@@ -58,15 +62,32 @@ const form = reactive({
 
 const router = useRouter(); // Declare router here
 
+const errorMessage = ref("");
+const authStore = useAuthStore()
+
 const submitForm = async () => {
-  const authStore = useAuthStore();
+  errorMessage.value = ""; // Reset error message before submission
+
   try {
-    const response = await axios.post(`${api.baseURL}/login`, form);
+    const response = await axios.post(`${api.baseURL}/login`, form, {
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      }
+    });
+
     console.log("Login successful:", response.data);
-    // Pass router to the store's login action
+
+    // Save token and redirect
     await authStore.login(form, router);
   } catch (error) {
-    console.error("Login failed:", error.response ? error.response.data : error.message);
+    if (error.response) {
+      errorMessage.value = error.response.data.message || "Login failed. Please try again.";
+    } else {
+      errorMessage.value = "Network error. Please check your connection.";
+    }
   }
 };
+;
+
 </script>

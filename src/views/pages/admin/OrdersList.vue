@@ -70,7 +70,7 @@
                 :billAmount="Number(order.total_price)" :orderID="selectedOrder" :paymentMethod="selectedMethod"
                 title="Keypad" @close="showCashModal[order.id] = false" @paymentSuccess="fetchOrders" />
               
-              <PreviewMpesa v-else-if="showMpesaModal[order.id]" :isOpen="showMpesaModal[order.id]"
+              <PreviewMpesa v-else-if="showMpesaModal[order.id]" :isOpen="showMpesaModal[order.id]" :orderID="order.id"
                 :billAmount="Number(order.total_price)" :orderNo="authStore.user.phone" :paymentMethod="selectedMethod"
                 title="PreviewMpesa" @close="showMpesaModal[order.id]=false" @paymentSuccess="fetchOrders" />
             </div>
@@ -84,7 +84,6 @@
 </template>
 
 
-
 <script setup>
 import { ref, onMounted, onUnmounted, defineProps } from 'vue';
 import axios from 'axios';
@@ -92,51 +91,106 @@ import api from '../../../api'
 import KeyPad from '../../../components/KeyPad.vue';
 import PreviewMpesa from '../../../components/PreviewMpesa.vue';
 import { useAuthStore } from '../../../store/auth';
+import { useRouter } from 'vue-router';
 
 const props = defineProps({
-  isOpen:Boolean,
+  isOpen: Boolean,
   activeTab: String,
   required: true,
 });
 
-const authStore = useAuthStore()
+const authStore = useAuthStore();
+const router = useRouter();
 
 const orders = ref([]);
 const selectedStatus = ref('All orders');
 const loading = ref(true);
 const error = ref(null);
 let intervalId = null;
-const showPaymentOptions = ref(null); // Track which order is processing payment
+const showPaymentOptions = ref(null);
 const selectedOrder = ref(null);
 const selectedMethod = ref('');
-//const selectedBill = ref(0);
+const showCashModal = ref({});
+const showMpesaModal = ref({});
 
-// Function to format the date
 const formatDate = (dateString) => {
   if (!dateString) return "";
   const date = new Date(dateString);
   const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
-  const year = String(date.getFullYear()).slice(-2); // Get last two digits of the year
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = String(date.getFullYear()).slice(-2);
   return `${day}/${month}/${year}`;
 };
 
-// Fetch orders from API
 const fetchOrders = async () => {
   try {
-    const response = await axios.get(`${api.baseURL}/orders`);
+    const authToken = authStore.token;
+    if (!authToken) {
+      alert("You need to log in first.");
+      router.push('/signin');
+      return;
+    }
+
+    const response = await axios.get(`${api.baseURL}/orders`, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+        Accept: 'application/json',
+      },
+      withCredentials: true,
+    });
+
     const allOrders = response.data;
-    console.log("order data:",allOrders)
-    orders.value  = props.activeTab ? allOrders.filter((p)=>p.status === props.activeTab) : allOrders
+    orders.value = props.activeTab ? allOrders.filter((p) => p.status === props.activeTab) : allOrders;
   } catch (err) {
-    error.value = 'Failed to fetch orders';
+    console.error("Fetch orders error:", err.response?.data || err.message);
+    error.value = err.response?.status === 401 ? "Session expired. Please log in again." : "Failed to fetch orders";
+    if (err.response?.status === 401) router.push('/signin');
   } finally {
     loading.value = false;
   }
 };
 
-const showCashModal = ref({});
-const showMpesaModal = ref({});
+const cancelOrder = async (id) => {
+  try {
+    const authToken = authStore.token;
+    if (!authToken) {
+      alert("You need to log in first.");
+      router.push('/signin');
+      return;
+    }
+    await axios.post(`${api.baseURL}/orders/${id}/cancel`, {}, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+        Accept: 'application/json',
+      },
+      withCredentials: true,
+    });
+    orders.value = orders.value.filter(order => order.id !== id);
+  } catch (err) {
+    alert(err.response?.data?.message || 'Failed to cancel order');
+  }
+};
+
+const stashOrder = async (id) => {
+  try {
+    const authToken = authStore.token;
+    if (!authToken) {
+      alert("You need to log in first.");
+      router.push('/signin');
+      return;
+    }
+    await axios.post(`${api.baseURL}/orders/${id}/stash`, {}, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+        Accept: 'application/json',
+      },
+      withCredentials: true,
+    });
+    alert('Order moved to unpaid tabs');
+  } catch (err) {
+    alert(err.response?.data?.message || 'Failed to stash order');
+  }
+};
 
 const openKeypad = (id, method) => {
   showCashModal.value = { [id]: !showCashModal.value[id] };
@@ -150,38 +204,17 @@ const openMpesaKeyPad = (id, method) => {
   selectedMethod.value = method;
 };
 
-
 onMounted(() => {
-  fetchOrders(); // Fetch initially
-  intervalId = setInterval(fetchOrders, 5000); // Fetch every 3 seconds
+  fetchOrders();
+  intervalId = setInterval(fetchOrders, 5000);
 });
 
 onUnmounted(() => {
-  clearInterval(intervalId); // Clear interval when component unmounts
+  clearInterval(intervalId);
 });
 
-
-// Filter orders dynamically
 const filteredOrders = () => {
   return orders.value.filter(o => selectedStatus.value === 'All orders' || o.status === selectedStatus.value);
-};
-
-const cancelOrder = async (id) => {
-  try {
-    await axios.post(`${api.baseURL}/orders/${id}/cancel`);
-    orders.value = orders.value.filter(order => order.id !== id);
-  } catch (err) {
-    alert('Failed to cancel order');
-  }
-};
-
-const stashOrder = async (id) => {
-  try {
-    await axios.post(`${api.baseURL}/orders/${id}/stash`);
-    alert('Order moved to unpaid tabs');
-  } catch (err) {
-    alert('Failed to stash order');
-  }
 };
 
 const togglePaymentOptions = (id) => {

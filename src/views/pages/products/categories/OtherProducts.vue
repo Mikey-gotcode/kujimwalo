@@ -83,6 +83,7 @@ import axios from "axios";
 import api from "../../../../api";
 import { useAuthStore } from "../../../../store/auth";
 import {useCartStore} from "../../../../store/cart"
+import {useRouter} from 'vue-router'
 
 const props = defineProps({
   activeTab: Number,
@@ -95,6 +96,7 @@ const quantities = ref({});
 const showCart = ref(false); // Controls cart visibility
 const authStore = useAuthStore()
 const cartStore = useCartStore()
+const router = useRouter()
 
 
 const isInStock = (product) => product.stock_quantity > 0;
@@ -133,27 +135,39 @@ const toggleCart = () => {
 };
 
 const checkout = async () => {
-  if (!authStore.user) {
-    alert("Please log in to place an order.");
-    return;
-  }
-
-  console.log("Sending Order Data:", JSON.stringify({ 
-    customer_id: authStore.user.id, 
-    items: cart.value 
-  }, null, 2));
-
   try {
-    const orderResponse = await axios.post(`${api.baseURL}/orders`, { 
+    const authToken = authStore.token;
+
+    if (!authToken) {
+      alert("You need to log in first.");
+      router.push('/signin');
+      return;
+    }
+
+    const orderPayload = {
       customer_id: authStore.user.id, 
       items: cart.value.map(item => ({
-        product_id: item.id,  // Ensure product_id is sent correctly
+        product_id: item.id,  
         quantity: item.quantity
-      })) 
-    });
+      }))
+    };
+
+    const orderResponse = await axios.post(
+      `${api.baseURL}/orders`,
+      orderPayload, 
+      {
+        headers: {
+          Authorization: `Bearer ${authToken}`, // Correctly formatted
+          Accept: 'application/json',
+          'Content-Type': 'application/json', // Explicitly defining content type
+        },
+        withCredentials: true, // Required for Laravel Sanctum authentication
+      }
+    );
 
     alert("Order placed successfully!");
     cart.value = [];
+    console.log("Order response:", orderResponse.data);
   } catch (error) {
     console.error("Error processing order:", error.response?.data || error.message);
   }
@@ -162,7 +176,20 @@ const checkout = async () => {
 
 const loadProducts = async () => {
   try {
-    const response = await axios.get(`${api.baseURL}/products`);
+    const authToken = authStore.token;
+
+    if (!authToken) {
+      alert("You need to log in first.");
+      router.push('/signin');
+      return;
+    }
+    const response = await axios.get(`${api.baseURL}/products`, {
+      headers: {
+        Authorization: `Bearer ${authToken}`, // Ensure the correct format
+        Accept: 'application/json', // Sometimes required for Laravel-based APIs
+      },
+      withCredentials: true, // Important if using Laravel Sanctum
+    });
     
     // Filter products
     products.value = props.activeTab ? response.data.filter((p) => p.category_id === props.activeTab) : response.data;

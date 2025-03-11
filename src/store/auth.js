@@ -43,6 +43,7 @@ export const useAuthStore = defineStore('auth', {
 
         // Store user data and token
         this.setUser(user, token, role);
+        console.log("user token",token)
 
         // Redirect based on role
         this.redirectUser(role, router);

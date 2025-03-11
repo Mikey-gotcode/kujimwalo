@@ -69,6 +69,8 @@
 import { ref, onBeforeMount, watchEffect, defineProps } from "vue";
 import axios from "axios";
 import api from "../../../../api";
+import { useAuthStore } from "../../../../store/auth";
+import {useRouter} from 'vue-router'
 
 const props = defineProps({
   activeTab: Number,
@@ -79,6 +81,9 @@ const products = ref([]);
 const selectedProduct = ref(null);
 const successMessage = ref("");
 const imageFile = ref(null); // Store the image file
+
+const authStore = useAuthStore()
+const router = useRouter()
 
 const isInStock = (product) => product.stock_quantity > 0;
 
@@ -123,7 +128,13 @@ const saveChanges = async () => {
       console.log(`${key}:`, value, `(Type: ${typeof value})`);
     }
 
-    await axios.put(`${api.baseURL}/products/${selectedProduct.value.id}`, formData, );
+    await axios.put(`${api.baseURL}/products/${selectedProduct.value.id}`, {
+      headers: {
+        Authorization: `Bearer ${authToken}`, // Ensure the correct format
+        Accept: 'application/json', // Sometimes required for Laravel-based APIs
+      },
+      withCredentials: true, // Important if using Laravel Sanctum
+    },formData, );
 
     const index = products.value.findIndex((p) => p.id === selectedProduct.value.id);
     if (index !== -1) {
@@ -142,7 +153,20 @@ const saveChanges = async () => {
 const confirmDelete = async (productId) => {
   if (confirm("Are you sure you want to delete this product?")) {
     try {
-      await axios.delete(`${api.baseURL}/products/${productId}`);
+      const authToken = authStore.token;
+
+      if (!authToken) {
+        alert("You need to log in first.");
+        router.push('/signin');
+        return;
+      }
+      await axios.delete(`${api.baseURL}/products/${productId}`,{
+      headers: {
+        Authorization: `Bearer ${authToken}`, // Ensure the correct format
+        Accept: 'application/json', // Sometimes required for Laravel-based APIs
+      },
+      withCredentials: true, // Important if using Laravel Sanctum
+    });
       products.value = products.value.filter((p) => p.id !== productId);
       showSuccessMessage("Product deleted successfully!");
     } catch (error) {
@@ -162,7 +186,20 @@ const showSuccessMessage = (message) => {
 // Load and filter products
 const loadProducts = async () => {
   try {
-    const response = await axios.get(`${api.baseURL}/products`);
+    const authToken = authStore.token;
+
+    if (!authToken) {
+      alert("You need to log in first.");
+      router.push('/signin');
+      return;
+    }
+    const response = await axios.get(`${api.baseURL}/products`,{
+      headers: {
+        Authorization: `Bearer ${authToken}`, // Ensure the correct format
+        Accept: 'application/json', // Sometimes required for Laravel-based APIs
+      },
+      withCredentials: true, // Important if using Laravel Sanctum
+    });
     const allProducts = response.data;
 
     // Filter products based on activeTab (categoryId)

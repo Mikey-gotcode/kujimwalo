@@ -36,9 +36,15 @@
  import { ref, reactive, defineProps, defineEmits } from 'vue';
  import axios from 'axios';
  import api from '../../../../api';
+import { useAuthStore } from '../../../../store/auth';
+import {useRouter} from 'vue-router'
  
  defineProps(['isOpen', 'title']);
  const emit = defineEmits();
+
+ const authStore = useAuthStore()
+const router = useRouter()
+
  
  
  const errorMessage = ref('');
@@ -53,8 +59,21 @@
  
  const submitForm = async () => {
     try {
-       console.log("form data:", formData);
-       const response = await axios.post(`${api.baseURL}/category`, formData);
+         const authToken = authStore.token;
+
+         if (!authToken) {
+            alert("You need to log in first.");
+            router.push('/signin');
+            return;
+         }
+       //console.log("form data:", formData);
+       const response = await axios.post(`${api.baseURL}/category`,formData,{
+         headers: {
+         Authorization: `Bearer ${authToken}`, // Ensure the correct format
+         Accept: 'application/json', // Sometimes required for Laravel-based APIs
+         },
+         withCredentials: true, // Important if using Laravel Sanctum
+      });
        
        // Display success message with green effect
        message.value = response.data.message;

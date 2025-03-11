@@ -45,11 +45,17 @@
     </div>
 </template>
 
+
+
 <script setup>
-import { ref, computed, inject, onMounted, nextTick, watch } from 'vue'
+import { ref, computed, onMounted, nextTick, watch, inject } from 'vue'
 import ProductNav from '../products/ProductNav.vue'
-import CategoriesSide from '../../layouts/CategoriesSide.vue'
-import OrdersList from './OrdersList.vue'
+import CategoriesSide from '../products/categories/CategoriesSide.vue'
+import OrdersList from '../products/OrderLIst.vue'
+
+// Computed property to map selectedTab to categoryMap
+const currentTab = computed(() => categoryMap.value[selectedTab.value] || null);
+
 
 // Inject theme
 const theme = inject('theme');
@@ -60,35 +66,57 @@ const borderClass = computed(() => theme.value === 'dark' ? 'border-gray-600' : 
 
 const selectedTab = ref('orders')
 
+
+// References for child components
+const hDrinkNumb = ref(null);
+
 const tabs = ref([
-    { id: 'orders', label: 'Manage Orders' },
-    { id: 'unpaid', label: 'Pending Bills' },
-    { id: 'completed', label: 'Completed Transactions' },
-    { id: 'cancelled', label: 'Cancelled Orders' }
+    {id:'orders',label:'Manage Orders'},
+    {id:'unpaid',label:'Pending Bills'},
+    {id:'completed', label:'Completed Transactions'},
+    {id:'cancelled',label:'Cancelled orders'}
 ])
 
+//const showChildCompunent = ref(false)
+
+
 const categoryMap = ref({
-    orders: 'pending',
-    unpaid: 'unpaid',
-    completed: 'completed',
-    cancelled: 'cancelled'
+    orders:'pending',
+    unpaid:'unpaid',
+    completed:'completed',
+    cancelled:'cancelled'
+
 })
+
 
 // Function to update selectedTab
 const selectTab = (tabId) => {
   selectedTab.value = tabId;
+  console.log("Selected tab:", selectedTab.value, "Current tab:", currentTab.value);
 };
+
+// Function to update product counts dynamically
+const updateRecordsCounts = async () => {
+  await nextTick();
+  tabs.value = tabs.value.map(tab => ({
+    ...tab,
+    label: `${tab.label} (${hDrinkNumb.value?.courseCount || 0})`
+  }));
+};
+
 
 const getCurrentTab = () => categoryMap[selectedTab.value]
 
+
 // Watch selectedTab and update currentTab accordingly
-const currentTab = computed(() => categoryMap.value[selectedTab.value] || null);
-
 watch(selectedTab, (newValue) => {
-    console.log("Updated currentTab:", currentTab.value);
+currentTab.value = categoryMap[newValue] || null;
+console.log("Updated currentTab:", currentTab.value);
 });
 
-onMounted(() => {
-    getCurrentTab();
-});
-</script>
+onMounted(()=>{
+    updateRecordsCounts()
+    getCurrentTab()
+})
+
+ </script>

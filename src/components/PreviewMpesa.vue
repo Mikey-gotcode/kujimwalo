@@ -6,7 +6,7 @@
                 <!-- Input Field -->
                 <input 
                     type="text" 
-                    v-model="props.billAmount" 
+                    v-model="amount" 
                     class="w-full mb-4 p-2 border border-gray-300 rounded text-lg text-center"
                     readonly
                 />
@@ -67,8 +67,8 @@
 
 
 <script setup>
-const HTTPS_MPESA = 'https://233bb7379607c5.lhr.life/api'
-import { defineProps, defineEmits,ref } from 'vue';
+const HTTPS_MPESA = 'https://guaranteed-conferencing-scanner-referral.trycloudflare.com/api'
+import { defineProps, defineEmits,ref, watch } from 'vue';
 import axios from 'axios';
 
 
@@ -76,6 +76,7 @@ const props = defineProps({
     isOpen: Boolean,
     billAmount: Number,
     orderNo: String, // Ensure this is defined
+    orderID:Number,
     paymentMethod: String,
     title: String // Ensure this is defined
 });
@@ -84,9 +85,11 @@ const emit = defineEmits(['close', 'paymentSuccess']);
 
 const numbers = ref([...Array(10).keys()].map(i => ({ id: i, value: i }))); // Generates numbers 0-9
 const alertMessage = ref('');
-const amount = ref(props.billAmount || '');
+const amount = ref(props.billAmount || 0);
 
-
+watch(() => props.billAmount, (newAmount) => {
+    amount.value = newAmount;
+});
 
 
 
@@ -96,12 +99,31 @@ const submitForm = async () => {
         return;
     }
 
+    //console.log(props.orderNo)
+
     try {
+
+        const authToken = authStore.token;
+
+        if (!authToken) {
+        alert("You need to log in first.");
+        router.push('/signin');
+        return;
+        }
+
         const response = await axios.post(`${HTTPS_MPESA}/stkpush`, {
-            amount: amount,
+            amount: amount.value,
             phone: props.orderNo,
-            payment_method: props.paymentMethod
-        });
+            account_number:'12345',
+            order_id:props.orderID
+        },
+        {
+        headers: {
+        Authorization: `Bearer ${authToken}`, // Ensure the correct format
+        Accept: 'application/json', // Sometimes required for Laravel-based APIs
+      },
+         withCredentials: true, // Important if using Laravel Sanctum
+    })
 
         if (response.data.success) {
             showAlert(response.data.message || "Payment successful");
@@ -113,6 +135,10 @@ const submitForm = async () => {
     } catch (error) {
         showAlert(error.response?.data?.error || "Payment failed");
     }
+};
+
+const appendNumber = (num) => {
+    amount.value += num;
 };
 
 

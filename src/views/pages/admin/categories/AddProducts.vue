@@ -53,9 +53,14 @@
 import { ref, reactive, defineProps, defineEmits, onMounted } from 'vue';
 import axios from 'axios';
 import api from '../../../../api';
+import { useAuthStore } from '../../../../store/auth';
+import {useRouter} from 'vue-router'
 
 defineProps(['isOpen', 'title']);
 const emit = defineEmits();
+
+const authStore = useAuthStore()
+const router = useRouter()
 
 const categories = ref([]);
 const errorMessage = ref('');
@@ -72,8 +77,21 @@ const messageType = ref('');
 
 const submitForm = async () => {
    try {
-      console.log("form data:", formData);
-      const response = await axios.post(`${api.baseURL}/products`, formData);
+      const authToken = authStore.token;
+
+      if (!authToken) {
+      alert("You need to log in first.");
+      router.push('/signin');
+      return;
+      }
+      //console.log("form data:", formData);
+      const response = await axios.post(`${api.baseURL}/products`,  formData,{
+      headers: {
+        Authorization: `Bearer ${authToken}`, // Ensure the correct format
+        Accept: 'application/json', // Sometimes required for Laravel-based APIs
+      },
+      withCredentials: true, // Important if using Laravel Sanctum
+    });
       
       // Display success message with green effect
       message.value = response.data.message;
@@ -95,8 +113,21 @@ const submitForm = async () => {
 };
 
 const fetchCategories = async () => {
+   const authToken = authStore.token
+
+      if (!authToken) {
+      alert("You need to log in first.");
+      router.push('/signin');
+      return;
+      }
    try {
-      const response = await axios.get(`${api.baseURL}/category`);
+      const response = await axios.get(`${api.baseURL}/category` ,{
+      headers: {
+        Authorization: `Bearer ${authToken}`, // Ensure the correct format
+        Accept: 'application/json', // Sometimes required for Laravel-based APIs
+      },
+      withCredentials: true, // Important if using Laravel Sanctum
+    });
       categories.value = response.data; // Assuming API returns an array of { id, name }
    } catch (error) {
       errorMessage.value = 'Failed to load categories';

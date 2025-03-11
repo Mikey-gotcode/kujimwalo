@@ -71,6 +71,8 @@
 import { ref, watch, defineProps, defineEmits } from 'vue';
 import axios from 'axios';
 import api from '../api';
+import { useAuthStore } from '../store/auth';
+import { useRouter } from 'vue-router';
 
 const props = defineProps({
     isOpen: Boolean,
@@ -81,6 +83,8 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['close', 'paymentSuccess']);
+const authStore = useAuthStore()
+const router = useRouter()
 
 const amount = ref(props.billAmount || 0);
 const alertMessage = ref('');
@@ -109,10 +113,25 @@ const submitForm = async () => {
     }
 
     try {
-        const response = await axios.post(`${api.baseURL}/orders/${props.orderID}/process-payment`, {
+        const authToken = authStore.token;
+
+        if (!authToken) {
+        alert("You need to log in first.");
+        router.push('/signin');
+        return;
+        }
+        const response = await axios.post(`${api.baseURL}/orders/${props.orderID}/process-payment`,
+        {
             amount:amount.value,
             payment_method:props.paymentMethod
-        });
+        },
+        {
+            headers: {
+                Authorization: `Bearer ${authToken}`, // Ensure the correct format
+                Accept: 'application/json', // Sometimes required for Laravel-based APIs
+      },
+      withCredentials: true, // Important if using Laravel Sanctum
+    });
 
         if (response.data.success) {
             showAlert(response.data.message || "Payment successful");

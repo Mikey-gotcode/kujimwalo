@@ -1,31 +1,35 @@
 <template>
   <ProductNav /> 
-  <div class="page-content py-8">
+  <div class="page-content py-8" :class="{ 'bg-gray-100 text-black': theme === 'light', 'bg-gray-900 text-white': theme === 'dark' }">
     <div class="container mx-auto px-4">
       <div class="flex flex-col lg:flex-row gap-6">
         <div class="lg:w-1/4 w-full">
           <CategoriesSide />
         </div>
 
-        <div class="lg:w-3/4 w-full">
-          <div class="bg-white shadow-md rounded-lg p-6 relative">
+        <div class="flex-1 p-4">
+          <div class="shadow-md rounded-lg p-6 "
+          :class="{ 'bg-white text-black': theme === 'light', 'bg-gray-800 text-white': theme === 'dark' }">
 
             <!-- View Cart Button (Fixed at Bottom) -->
             <button 
               v-if="cart.length" 
               @click="toggleCart" 
               class="fixed bottom-5 right-5 md:right-10 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 md:py-4 md:px-5 rounded-lg shadow-lg transition"
+              :class="{ 'bg-blue-500 text-white': theme === 'light', 'bg-blue-400 text-black': theme === 'dark' }"
             >
               View Cart ({{ cart.length }})
             </button>
 
-            <div class="border-b pb-4 mb-4">
+            <div class="border-b pb-4 mb-4"
+            :class="{ 'border-gray-300': theme === 'light', 'border-gray-600': theme === 'dark' }">
               <h3 class="text-xl font-semibold">Products</h3>
             </div>
             
             <!-- Tab Navigation -->
             <div class="overflow-x-auto">
-              <ul class="flex border-b whitespace-nowrap">
+              <ul class="flex border-b whitespace-nowrap"
+              :class="{ 'border-gray-300': theme === 'light', 'border-gray-600': theme === 'dark' }">
                 <li 
                   v-for="tab in tabs" 
                   :key="tab.id"
@@ -81,12 +85,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, nextTick } from 'vue';
+import { ref, onMounted, computed, nextTick, inject } from 'vue';
 import axios from 'axios';
 import api from '../../../../api';
 import ProductNav from '../ProductNav.vue';
-import CategoriesSide from '../../../layouts/CategoriesSide.vue';
+import CategoriesSide from '../categories/CategoriesSide.vue';
 import OtherProducts from './OtherProducts.vue';
+import { useAuthStore } from '../../../../store/auth';
+import {useRouter} from 'vue-router'
 
 const tabs = ref([]);
 const categoryMap = ref({});
@@ -96,11 +102,31 @@ const showCart = ref(false); // Controls cart visibility
 
 // Computed property to map selectedTab to categoryMap
 const currentTab = computed(() => categoryMap.value[selectedTab.value] || null);
+const authStore = useAuthStore()
+const router = useRouter()
+
+
+// Inject theme
+const theme = inject("theme");
+
 
 // Fetch categories and dynamically create categoryMap
 const fetchCategories = async () => {
   try {
-    const response = await axios.get(`${api.baseURL}/category`);
+    const authToken = authStore.token
+
+    if (!authToken) {
+      alert("You need to log in first.");
+      router.push('/signin');
+      return;
+    }
+    const response = await axios.get(`${api.baseURL}/category`, {
+      headers: {
+        Authorization: `Bearer ${authToken}`, // Ensure the correct format
+        Accept: 'application/json', // Sometimes required for Laravel-based APIs
+      },
+      withCredentials: true, // Important if using Laravel Sanctum
+    });
     
     tabs.value = response.data.map((category, index) => ({
       id: category.id, // Unique ID from API
@@ -150,11 +176,30 @@ const toggleCart = () => {
 const checkout = async () => {
   console.log("shopping cart:",cart.value)
   try {
-    const orderResponse = await axios.post(`${api.baseURL}/orders`, { items: cart.value });
+    const authToken = authStore.token;
+
+    if (!authToken) {
+      alert("You need to log in first.");
+      router.push('/signin');
+      return;
+    }
+    const orderResponse = await axios.post(`${api.baseURL}/orders`, {
+      headers: {
+        Authorization: `Bearer ${authToken}`, // Ensure the correct format
+        Accept: 'application/json', // Sometimes required for Laravel-based APIs
+      },
+      withCredentials: true, // Important if using Laravel Sanctum
+    }, { items: cart.value });
     const orderId = orderResponse.data.id;
     
     for (const item of cart.value) {
-      await axios.post(`${api.baseURL}/order_items/`, { orderId, productId: item.id, quantity: item.quantity });
+      await axios.post(`${api.baseURL}/order_items/`, {
+      headers: {
+        Authorization: `Bearer ${authToken}`, // Ensure the correct format
+        Accept: 'application/json', // Sometimes required for Laravel-based APIs
+      },
+      withCredentials: true, // Important if using Laravel Sanctum
+    },{ orderId, productId: item.id, quantity: item.quantity });
     }
     
     alert("Order placed successfully!");
