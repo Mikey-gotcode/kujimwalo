@@ -11,7 +11,7 @@
         <!-- Main Content -->
         <div class="flex-1 p-4">
           <div class="shadow-md rounded-lg p-6"
-            :class="{ 'bg-white text-black': theme === 'light', 'bg-gray-800 text-white': theme === 'dark' }">
+            :class="{ 'bg-white text-gray-900': theme === 'light', 'bg-gray-700 text-gray-200': theme === 'dark' }">
         
 
             <!-- Buttons -->

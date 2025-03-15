@@ -3,35 +3,43 @@
     <div class="max-w-screen-xl mx-auto px-4">
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-semibold text-gray-900 dark:text-white">My Orders</h2>
-        <select v-model="selectedStatus" class="border border-gray-300 dark:border-gray-700 p-2 rounded-md">
-          <option>All orders</option>
-          <option value="pending">Pending</option>
-          <option value="unpaid">Unpaid</option>
-          <option value="completed">Completed</option>
-          <option value="cancelled">Cancelled</option>
-        </select>
+
+
+        <div class="flex gap-4">
+          <select v-model="selectedDateFilter" class="border p-2 rounded-md">
+            <option value="all">All Time</option>
+            <option value="today">Today</option>
+            <option value="week">This Week</option>
+            <option value="month">This Month</option>
+            <option value="six_months">Last 6 Months</option>
+            <option value="year">This Year</option>
+          </select>
+          
+          <input v-model="searchCustomerId" type="text" placeholder="Search by Customer ID" class="border p-2 rounded-md" />
+          <button @click="searchOrder" class="bg-blue-500 text-white px-4 py-2 rounded-md">Search</button>
+        </div>
       </div>
+
 
       <div v-if="loading" class="text-gray-500 text-center">Loading orders...</div>
       <div v-else-if="error" class="text-red-500 text-center">{{ error }}</div>
 
       <div v-else>
-        <div v-if="filteredOrders().length" class="space-y-6">
+        <div v-if="filteredOrders().length && filteredDates().length" class="space-y-6">
           <div v-for="order in filteredOrders()" :key="order.id"
             class="border border-gray-300 dark:border-gray-700 rounded-lg p-6 shadow-md bg-gray-50 dark:bg-gray-800 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             
             <div class="flex flex-col md:flex-row md:items-center md:gap-6 w-full">
-              <p class="text-lg font-semibold">Order ID: #{{ order.id }}</p>
+              <p class="text-lg font-semibold">Order:#{{ order.id }}</p>
               <p class="text-gray-600 dark:text-gray-300">Total Price: ${{ order.total_price }}</p>
-              <p class="text-yellow-600 dark:text-gray-300">Status: <span class="font-medium">{{ order.status }}</span></p>
+              <p class="text-yellow-600 dark:text-gray-300">Name: <span class="font-medium">{{ order.customer.name }}</span></p>
               <p class="text-gray-600 dark:text-gray-300">Created At: {{ formatDate(order.created_at) }}</p>
-              <p class="text-gray-600 dark:text-gray-300">Name: {{ order.name }}</p>
             </div>
             
             <div class="mt-2 w-full">
               <p class="text-lg font-bold text-white">Items:</p>
               <ul class="list-disc pl-5 text-white font-bold text-lg">
-                <li v-for="item in order.items" :key="item.product.id">{{ item.product.name }} [{{ item.quantity }}]</li>
+                <li v-for="item in order.items" :key="item.product_id">{{ item.product_name }} [{{ item.quantity }}]</li>
               </ul>
             </div>
             
@@ -71,7 +79,7 @@
                 title="Keypad" @close="showCashModal[order.id] = false" @paymentSuccess="fetchOrders" />
               
               <PreviewMpesa v-else-if="showMpesaModal[order.id]" :isOpen="showMpesaModal[order.id]" :orderID="order.id"
-                :billAmount="Number(order.total_price)" :orderNo="authStore.user.phone" :paymentMethod="selectedMethod"
+                :billAmount="Number(order.total_price)" :orderNo="order.customer.phone" :paymentMethod="selectedMethod"
                 title="PreviewMpesa" @close="showMpesaModal[order.id]=false" @paymentSuccess="fetchOrders" />
             </div>
           </div>
@@ -106,6 +114,8 @@ const orders = ref([]);
 const selectedStatus = ref('All orders');
 const loading = ref(true);
 const error = ref(null);
+const selectedDateFilter = ref('all');
+const searchCustomerId = ref('');
 let intervalId = null;
 const showPaymentOptions = ref(null);
 const selectedOrder = ref(null);
@@ -114,13 +124,35 @@ const showCashModal = ref({});
 const showMpesaModal = ref({});
 
 const formatDate = (dateString) => {
-  if (!dateString) return "";
   const date = new Date(dateString);
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const year = String(date.getFullYear()).slice(-2);
-  return `${day}/${month}/${year}`;
+  return date.toLocaleDateString();
 };
+const filteredDates = (() => {
+  const now = new Date();
+  return orders.value.filter(order => {
+    const orderDate = new Date(order.created_at);
+    if (selectedDateFilter.value === 'today') {
+      return orderDate.toDateString() === now.toDateString();
+    }
+    if (selectedDateFilter.value === 'week') {
+      const oneWeekAgo = new Date();
+      oneWeekAgo.setDate(now.getDate() - 7);
+      return orderDate >= oneWeekAgo;
+    }
+    if (selectedDateFilter.value === 'month') {
+      return orderDate.getMonth() === now.getMonth() && orderDate.getFullYear() === now.getFullYear();
+    }
+    if (selectedDateFilter.value === 'six_months') {
+      const sixMonthsAgo = new Date();
+      sixMonthsAgo.setMonth(now.getMonth() - 6);
+      return orderDate >= sixMonthsAgo;
+    }
+    if (selectedDateFilter.value === 'year') {
+      return orderDate.getFullYear() === now.getFullYear();
+    }
+    return true;
+  });
+});
 
 const fetchOrders = async () => {
   try {
@@ -140,6 +172,7 @@ const fetchOrders = async () => {
     });
 
     const allOrders = response.data;
+    //console.log(allOrders)
     orders.value = props.activeTab ? allOrders.filter((p) => p.status === props.activeTab) : allOrders;
   } catch (err) {
     console.error("Fetch orders error:", err.response?.data || err.message);
@@ -206,7 +239,7 @@ const openMpesaKeyPad = (id, method) => {
 
 onMounted(() => {
   fetchOrders();
-  intervalId = setInterval(fetchOrders, 5000);
+  intervalId = setInterval(fetchOrders, 10000);
 });
 
 onUnmounted(() => {

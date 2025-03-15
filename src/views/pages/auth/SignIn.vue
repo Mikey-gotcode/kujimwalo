@@ -15,10 +15,30 @@
                 <label for="phone_number" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your email</label>
                 <input v-model="form.email" type="email" id="email" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="example@gmail.com" required>
               </div>
-              <div>
-                <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
-                <input v-model="form.password" type="password" id="password" placeholder="••••••••" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
+             <!-- Password Field -->
+            <div>
+              <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
+              <div class="relative">
+                <input v-model="form.password" :type="showPassword ? 'text' : 'password'" id="password"
+                  placeholder="••••••••"
+                  class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  required />
+                <button type="button" @click="showPassword = !showPassword"
+                  class="absolute inset-y-0 right-3 flex items-center">
+                  <svg v-if="showPassword" class="w-5 h-5 text-gray-500 dark:text-gray-300"
+                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15.75 15.75A5.978 5.978 0 0112 17c-3.314 0-6-2.686-6-6a5.978 5.978 0 011.25-3.75M9 10l3 3m0-3l-3 3M21 12c-3.75 6-9 6-12 0 3.75-6 9-6 12 0z" />
+                  </svg>
+                  <svg v-else class="w-5 h-5 text-gray-500 dark:text-gray-300" xmlns="http://www.w3.org/2000/svg"
+                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M3 3l18 18M9.88 9.88A3 3 0 0112 9c1.657 0 3 1.343 3 3a3 3 0 01-.88 2.12M9.88 9.88L3 3m9 9a3 3 0 013 3m0 0l6.12 6.12m-3.12-3.12a5.978 5.978 0 01-3.88 1.5c-3.314 0-6-2.686-6-6a5.978 5.978 0 011.5-3.88" />
+                  </svg>
+                </button>
               </div>
+              <p v-if="errorMessage.password" class="text-red-500 text-sm">{{ errorMessage.password[0] }}</p>
+            </div>
               <div v-if="errorMessage" class="text-red-500 text-sm">
                     {{ errorMessage }}
                   </div>
@@ -63,6 +83,7 @@ const form = reactive({
 const router = useRouter(); // Declare router here
 
 const errorMessage = ref("");
+const showPassword = ref(false);
 const authStore = useAuthStore()
 
 const submitForm = async () => {

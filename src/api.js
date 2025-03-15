@@ -1,4 +1,5 @@
 export default {
-    baseURL: 'https://guaranteed-conferencing-scanner-referral.trycloudflare.com/api',
+    baseURL: 'https://blue-party-compare-distinction.trycloudflare.com/api',
+    qrURL:'previews-options-down-explain.trycloudflare.com'
   };
   

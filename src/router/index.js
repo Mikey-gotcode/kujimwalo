@@ -2,11 +2,20 @@ import { createRouter, createWebHistory } from "vue-router";
 import MainHome from '../views/pages/home/MainHome.vue'
 import SignIn from '../views/pages/auth/SignIn.vue'
 import SignUp from '../views/pages/auth/SignUp.vue'
+
+//customer routes
 import CategoryIndex from '../views/pages/products/categories/CategoriesIndex.vue'
 import CategoriesDashboard from '../views/pages/products/categories/CategoriesDashboard.vue'
 import ManageCOrders from '../views/pages/products/ManageCOrders.vue'
 import CustomerProfile from '../views/pages/admin/users/CustomerProfile.vue'
-import UserSettings from '../views/pages/admin/users/UserSettings.vue'
+import UserCSettings from '../views/pages/admin/users/UserSettings.vue'
+
+
+//staff routes
+import CategoriesDashboardStaff from '../views/pages/products/categories/CategoriesDashboardStaff.vue'
+import ManageSOrders from '../views/pages/products/ManageCOrders.vue'
+import StaffProfile from '../views/pages/admin/staff/StaffProfile.vue'
+import UserSSettings from '../views/pages/admin/staff/UserSettings.vue'
 
 
 //admin routes
@@ -15,6 +24,7 @@ import AdminDashboard from '../views/pages/admin/AdminDashboard.vue'
 import AdminStock from '../views/pages/admin/AdminStock.vue' 
 import ManageOrders from '../views/pages/admin/ManageOrders.vue' 
 import AdminSettings from '../views/pages/admin/AdminSettings.vue' 
+import QRComponent from '../views/pages/admin/QRComponent.vue' 
 //import ManageCOrders from '../views/pages/products/ManageCOrders.vue'
 
 const routes =[
@@ -39,7 +49,7 @@ const routes =[
             {path:'profile',component:CustomerProfile},
             {path:'categories-dashboard',component:CategoriesDashboard},
             {path:'manageorders',component:ManageCOrders},
-            {path:'settings',component:UserSettings}
+            {path:'settings',component:UserCSettings}
         ]
     }
 
@@ -52,9 +62,24 @@ const routes =[
             {path:'admindashboard',component:AdminDashboard},
             {path:'adminstock',component:AdminStock },
             {path:'manageorders',component:ManageOrders},
-            {path:'settings',component:AdminSettings}
+            {path:'settings',component:AdminSettings},
+            {path:'qrcode',component:QRComponent}
         ]
     },
+    {
+        path:'/staff',
+        component:CategoryIndex,
+        children:[
+            {path:'/staff',redirect:'/staff/categories-dashboard'},
+            {path:'profile',component:StaffProfile},
+            {path:'categories-dashboard',component:CategoriesDashboardStaff},
+            {path:'manageorders',component:ManageSOrders},
+            {path:'settings',component:UserSSettings}
+        ]
+    }
+
+    ,
+
     {
         path:'/signin',
         component:SignIn

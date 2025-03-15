@@ -32,7 +32,7 @@
                         <div class="mt-2 w-full">
                             <p class="text-lg font-bold text-white">Items:</p>
                             <ul class="list-disc pl-5 text-white font-bold text-lg">
-                                <li v-for="item in order.items" :key="item.product.id">{{ item.product.name }}
+                                <li v-for="item in order.items" :key="item.product_id">{{ item.product_name }}
                                     [{{ item.quantity }}]</li>
                             </ul>
                         </div>

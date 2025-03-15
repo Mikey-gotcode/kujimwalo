@@ -27,6 +27,11 @@ const menuItems = ref({
       label: "Settings",
       icon: "../../assets/icons/bottle-of-martini-martini-alcohol-drink-svgrepo-com.svg",
       link: "/admin/settings"
+    },
+    {
+      label: "QR CODE",
+      icon: "../../assets/icons/bottle-of-martini-martini-alcohol-drink-svgrepo-com.svg",
+      link: "/admin/qrcode"
     }
   ]
 })
