@@ -1,5 +1,5 @@
 export default {
-    baseURL: 'https://blue-party-compare-distinction.trycloudflare.com/api',
-    qrURL:'previews-options-down-explain.trycloudflare.com'
+    baseURL: 'https://dark-imaging-shapes-measure.trycloudflare.com/api',
+    qrURL:'https://kujimwalo.netlify.app'
   };
   
