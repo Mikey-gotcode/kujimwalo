@@ -90,7 +90,7 @@ const submitForm = async () => {
   errorMessage.value = ""; // Reset error message before submission
 
   try {
-    const response = await axios.post(`${api.baseURL || api.localURL}/login`, form, {
+    const response = await axios.post(`${api.localURL || api.baseURL}/login`, form, {
       headers: {
         "Content-Type": "application/json",
         "Accept": "application/json"

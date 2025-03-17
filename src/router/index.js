@@ -7,7 +7,7 @@ import SignUp from '../views/pages/auth/SignUp.vue'
 import CategoryIndex from '../views/pages/products/categories/CategoriesIndex.vue'
 import CategoriesDashboard from '../views/pages/products/categories/CategoriesDashboard.vue'
 import ManageCOrders from '../views/pages/products/ManageCOrders.vue'
-import CustomerProfile from '../views/pages/admin/users/CustomerProfile.vue'
+import CustomerProfile from '../views/pages/admin/users/CustomerDashboard.vue'
 import UserCSettings from '../views/pages/admin/users/UserSettings.vue'
 
 
@@ -25,22 +25,13 @@ import AdminStock from '../views/pages/admin/AdminStock.vue'
 import ManageOrders from '../views/pages/admin/ManageOrders.vue' 
 import AdminSettings from '../views/pages/admin/AdminSettings.vue' 
 import QRComponent from '../views/pages/admin/QRComponent.vue' 
-//import ManageCOrders from '../views/pages/products/ManageCOrders.vue'
+
 
 const routes =[
     {
         path:'/',
         component:MainHome
     },
-    // {
-    //     path:"/products",
-    //     component:CategoryIndex,
-    //     children:[
-    //         {path:'/products',redirect:'/categories/categories-dashboard'},
-    //         {path:'categories-dashboard',component:CategoriesDashboard}
-    //     ]
-    // },
-
     {
         path:'/customer',
         component:CategoryIndex,
@@ -76,10 +67,7 @@ const routes =[
             {path:'manageorders',component:ManageSOrders},
             {path:'settings',component:UserSSettings}
         ]
-    }
-
-    ,
-
+    },
     {
         path:'/signin',
         component:SignIn
