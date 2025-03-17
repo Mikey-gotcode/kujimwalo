@@ -110,16 +110,16 @@ const cancelOrder = async (id) => {
                         class="border border-gray-300 dark:border-gray-700 rounded-lg p-6 shadow-md bg-gray-50 dark:bg-gray-800 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
 
                         <div class="flex flex-col md:flex-row md:items-center md:gap-6 w-full">
-                            <p :class="theme === 'light' ? 'text-gray-900' : 'text-white'" class="text-lg font-semibold">
+                            <p :class="theme === 'light' ? 'text-black' : 'text-white'" class="text-lg font-semibold">
                                 Order ID: #{{ order.id }}
                             </p>
-                            <p :class="theme === 'light' ? 'text-gray-600' : 'text-gray-300'">
+                            <p :class="theme === 'light' ? 'text-black' : 'text-gray-300'">
                                 Total Price: ${{ order.total_price }}
                             </p>
                             <p :class="theme === 'light' ? 'text-yellow-600' : 'text-gray-300'">
                                 Status: <span class="font-medium">{{ order.status }}</span>
                             </p>
-                            <p :class="theme === 'light' ? 'text-gray-600' : 'text-gray-300'">
+                            <p :class="theme === 'light' ? 'text-black' : 'text-gray-300'">
                                 Created At: {{ formatDate(order.created_at) }}
                             </p>
                         </div>

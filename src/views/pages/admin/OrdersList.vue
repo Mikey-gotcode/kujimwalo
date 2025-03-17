@@ -2,7 +2,8 @@
   <section class="bg-white dark:bg-gray-900 py-8 md:py-16">
     <div class="max-w-screen-xl mx-auto px-4">
       <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-semibold text-gray-900 dark:text-white">My Orders</h2>
+        <h2 :class="theme === 'light' ? 'text-gray-900' : 'text-white'"
+            class="text-2xl font-semibold text-gray-900 dark:text-white">My Orders</h2>
 
 
         <div class="flex gap-4">
@@ -30,15 +31,17 @@
             class="border border-gray-300 dark:border-gray-700 rounded-lg p-6 shadow-md bg-gray-50 dark:bg-gray-800 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             
             <div class="flex flex-col md:flex-row md:items-center md:gap-6 w-full">
-              <p class="text-lg font-semibold">Order:#{{ order.id }}</p>
-              <p class="text-gray-600 dark:text-gray-300">Total Price: ${{ order.total_price }}</p>
-              <p class="text-yellow-600 dark:text-gray-300">Name: <span class="font-medium">{{ order.customer.name }}</span></p>
-              <p class="text-gray-600 dark:text-gray-300">Created At: {{ formatDate(order.created_at) }}</p>
+              <p :class="theme === 'light' ? 'text-black' : 'text-white'"  class="text-lg font-semibold">Order:#{{ order.id }}</p>
+              <p :class="theme === 'light' ? 'text-black' : 'text-gray-300'">Total Price: ${{ order.total_price }}</p>
+              <p :class="theme === 'light' ? 'text-yellow-600' : 'text-gray-300'">Name: <span class="font-medium">{{ order.customer.name }}</span></p>
+              <p :class="theme === 'light' ? 'text-black' : 'text-gray-300'">Created At: {{ formatDate(order.created_at) }}</p>
             </div>
             
             <div class="mt-2 w-full">
-              <p class="text-lg font-bold text-white">Items:</p>
-              <ul class="list-disc pl-5 text-white font-bold text-lg">
+              <p :class="theme === 'light' ? 'text-gray-900' : 'text-white'"
+                  class="text-lg font-bold">Items:</p>
+              <ul class="list-disc pl-5 font-bold text-lg"
+                  :class="theme === 'light' ? 'text-gray-900' : 'text-white'">
                 <li v-for="item in order.items" :key="item.product_id">{{ item.product_name }} [{{ item.quantity }}]</li>
               </ul>
             </div>
