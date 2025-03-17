@@ -2,8 +2,8 @@
     "brand": {
       "name": "KUJIMWALO",
       "logo": {
-        "light": "../../../public/kujimwalo.svg",
-        "dark": "../../../public/kujimwalo.svg"
+        "light": "kujimwalo.svg",
+        "dark": "kujimwalo.svg"
       },
       "link": "/"
     },
