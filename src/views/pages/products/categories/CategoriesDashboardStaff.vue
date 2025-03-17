@@ -89,7 +89,7 @@
   import axios from 'axios';
   import api from '../../../../api';
   import ProductNav from '../ProductNav.vue';
-  import CategoriesSide from '../categories/CategoriesSide.vue';
+  import CategoriesSide from '../categories/CategoriesSide(2).vue';
   import OtherProducts from './OtherProducts.vue';
   import { useAuthStore } from '../../../../store/auth';
   import {useRouter} from 'vue-router'
