@@ -1,0 +1,50 @@
+{
+    "brand": {
+      "name": "KUJIMWALO",
+      "logo": {
+        "light": "../../../public/kujimwalo.svg",
+        "dark": "../../../public/kujimwalo.svg"
+      },
+      "link": "/"
+    },
+    "menuItems": [
+      {
+        "name": "Home",
+        "link": "/"
+      },
+      {
+        "name": "Best Sellers",
+        "link": "/best-sellers"
+      },
+      {
+        "name": "Today's Deals",
+        "link": "/deals"
+      },
+      {
+        "name": "Sell",
+        "link": "/sell"
+      }
+    ],
+    "cart": {
+      "label": "My Cart",
+      "icon": "cart-icon.svg",
+      "items": [
+        {
+          "name": "Apple iPhone 15",
+          "price": "$599",
+          "quantity": 1
+        },
+        {
+          "name": "Apple iPad Air",
+          "price": "$499",
+          "quantity": 1
+        },
+        {
+          "name": "Apple Watch SE",
+          "price": "$598",
+          "quantity": 2
+        }
+      ]
+    }
+  }
+  
