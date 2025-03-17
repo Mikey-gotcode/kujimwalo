@@ -98,13 +98,16 @@
 
 
 <script setup>
-import { ref, onMounted, onUnmounted, defineProps } from 'vue';
+import { ref, onMounted, onUnmounted, defineProps, inject } from 'vue';
 import axios from 'axios';
 import api from '../../../api'
 import KeyPad from '../../../components/KeyPad.vue';
 import PreviewMpesa from '../../../components/PreviewMpesa.vue';
 import { useAuthStore } from '../../../store/auth';
 import { useRouter } from 'vue-router';
+
+// Inject theme from the provider
+const theme = inject('theme', ref('light')); // Default to light if not provided
 
 const props = defineProps({
   isOpen: Boolean,
