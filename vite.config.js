@@ -12,8 +12,8 @@ export default defineConfig({
     host: true, // Allow access from external networks
     port: 5173, // Ensure this matches your dev server port
     allowedHosts: [
-      "localhost",
-      "https://dark-imaging-shapes-measure.trycloudflare.com"//backend api cor cors
+      "http://localhost:5173",
+      "https://county-cause-boundaries-ordering.trycloudflare.com"//backend api cor cors
     ],
     cors: true, // Enable CORS for external access
   },
