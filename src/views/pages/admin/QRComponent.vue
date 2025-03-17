@@ -57,6 +57,6 @@ const theme = inject('theme');
 const url = ref(`${api.qrURL}/customer/categories-dashboard`);
 const fgColor = ref("#000000");
 const bgColor = ref("#ffffff");
-const companyLogo = ref("../../../../public/kujimwalo.svg"); // Path to your logo
+const companyLogo = ref("kujimwalo.svg"); // Path to your logo
 
 </script>
