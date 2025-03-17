@@ -3,7 +3,7 @@
     <!-- Background Image -->
     <div
       class="absolute inset-0 bg-cover bg-center"
-      :style="{ backgroundImage: `url(src/assets/img/layouts/background.jpeg)` }"
+      :style="{ backgroundImage: `url(@/assets/img/layouts/background.jpeg)` }"
     ></div>
 
     <!-- Overlay -->

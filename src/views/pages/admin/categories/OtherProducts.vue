@@ -1,15 +1,12 @@
 <template>
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-    <div v-for="product in products" :key="product.id"
-      class="bg-white rounded-lg shadow-md transition hover:shadow-lg p-4">
+    <div v-for="product in products" :key="product.id" class="bg-white rounded-lg shadow-md transition hover:shadow-lg p-4">
       <div class="relative">
-        <img :src="product.image" :alt="product.name" class="w-full h-48 object-cover rounded-lg" />
+        <img :src="require(`@/assets/productImages/${product.imageURL}`)" :alt="product.name" class="w-full h-48 object-cover rounded-lg" />
       </div>
 
       <div class="p-4 min-h-[400px]">
-        <h3 class="text-lg font-semibold text-gray-800">
-          {{ product.name }}
-        </h3>
+        <h3 class="text-lg font-semibold text-gray-800">{{ product.name }}</h3>
         <p class="text-gray-600 text-sm">Category ID: {{ product.category_id }}</p>
         <p class="text-gray-600 text-sm">Last Restocked: {{ product.last_restocked }}</p>
         <div class="flex justify-between items-center mt-2">
@@ -20,13 +17,11 @@
         </div>
 
         <div class="flex gap-2 mt-4">
-          <button @click="editProduct(product)"
-            class="w-full bg-blue-500 hover:bg-yellow-600 text-white font-semibold py-2 rounded-lg shadow-md transition border border-red-500 hover:cursor-pointer">
+          <button @click="editProduct(product)" class="w-full bg-blue-500 hover:bg-yellow-600 text-white font-semibold py-2 rounded-lg shadow-md transition border border-red-500 hover:cursor-pointer">
             Edit
           </button>
 
-          <button @click="confirmDelete(product.id)"
-            class="w-full bg-red-500 hover:bg-red-700 text-white font-semibold py-2 rounded-lg shadow-md transition border border-gray-500 hover:cursor-pointer">
+          <button @click="confirmDelete(product.id)" class="w-full bg-red-500 hover:bg-red-700 text-white font-semibold py-2 rounded-lg shadow-md transition border border-gray-500 hover:cursor-pointer">
             Delete
           </button>
         </div>
@@ -57,33 +52,26 @@
     </div>
   </div>
 
-  <!-- Success Message -->
-  <div v-if="successMessage"
-    class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg transition-opacity duration-500">
+  <div v-if="successMessage" class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg transition-opacity duration-500">
     {{ successMessage }}
   </div>
 </template>
-
 
 <script setup>
 import { ref, onBeforeMount, watchEffect, defineProps } from "vue";
 import axios from "axios";
 import api from "../../../../api";
 import { useAuthStore } from "../../../../store/auth";
-import {useRouter} from 'vue-router'
+import { useRouter } from 'vue-router';
 
-const props = defineProps({
-  activeTab: Number,
-  required: true,
-});
+const props = defineProps({ activeTab: Number });
 
 const products = ref([]);
 const selectedProduct = ref(null);
 const successMessage = ref("");
-const imageFile = ref(null); // Store the image file
-
-const authStore = useAuthStore()
-const router = useRouter()
+const imageFile = ref(null);
+const authStore = useAuthStore();
+const router = useRouter();
 
 const isInStock = (product) => product.stock_quantity > 0;
 
@@ -101,45 +89,43 @@ const editProduct = (product) => {
 };
 
 const saveChanges = async () => {
-  if (
-    !selectedProduct.value.name ||
-    !selectedProduct.value.price ||
-    !selectedProduct.value.category_id ||
-    !selectedProduct.value.stock_quantity
-  ) {
+  if (!selectedProduct.value.name || !selectedProduct.value.price || !selectedProduct.value.stock_quantity) {
     alert("All fields are required.");
     return;
   }
 
   try {
     const formData = new FormData();
-
     formData.append("name", selectedProduct.value.name);
-    formData.append("price", parseFloat(selectedProduct.value.price));  // Ensure price is a number
+    formData.append("price", parseFloat(selectedProduct.value.price));
     formData.append("category_id", parseInt(selectedProduct.value.category_id));  // Ensure category_id is an integer
-    formData.append("stock_quantity", parseInt(selectedProduct.value.stock_quantity)); // Ensure stock_quantity is an integer
+    formData.append("stock_quantity", parseInt(selectedProduct.value.stock_quantity));
 
     if (imageFile.value) {
       formData.append("image", imageFile.value);
     }
 
-    // Debugging: Verify formData types
-    for (let [key, value] of formData.entries()) {
-      console.log(`${key}:`, value, `(Type: ${typeof value})`);
+    const authToken = authStore.token;
+    if (!authToken) {
+      alert("You need to log in first.");
+      router.push('/signin');
+      return;
     }
 
-    await axios.put(`${api.baseURL}/products/${selectedProduct.value.id}`, {
+    const response = await axios.put(`${api.baseURL}/products/${selectedProduct.value.id}`, formData, {
       headers: {
-        Authorization: `Bearer ${authToken}`, // Ensure the correct format
-        Accept: 'application/json', // Sometimes required for Laravel-based APIs
+        Authorization: `Bearer ${authToken}`,
+        "Content-Type": "multipart/form-data",
       },
-      withCredentials: true, // Important if using Laravel Sanctum
-    },formData, );
+      withCredentials: true,
+    });
 
+    const updatedProduct = response.data;
     const index = products.value.findIndex((p) => p.id === selectedProduct.value.id);
     if (index !== -1) {
-      products.value[index] = { ...products.value[index], ...selectedProduct.value };
+      products.value[index] = updatedProduct;
     }
+
     selectedProduct.value = null;
     showSuccessMessage("Product updated successfully!");
   } catch (error) {
@@ -147,26 +133,23 @@ const saveChanges = async () => {
   }
 };
 
-
-
-// Delete Product
 const confirmDelete = async (productId) => {
   if (confirm("Are you sure you want to delete this product?")) {
     try {
       const authToken = authStore.token;
-
       if (!authToken) {
         alert("You need to log in first.");
         router.push('/signin');
         return;
       }
-      await axios.delete(`${api.baseURL}/products/${productId}`,{
-      headers: {
-        Authorization: `Bearer ${authToken}`, // Ensure the correct format
-        Accept: 'application/json', // Sometimes required for Laravel-based APIs
-      },
-      withCredentials: true, // Important if using Laravel Sanctum
-    });
+
+      await axios.delete(`${api.baseURL}/products/${productId}`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+        withCredentials: true,
+      });
+
       products.value = products.value.filter((p) => p.id !== productId);
       showSuccessMessage("Product deleted successfully!");
     } catch (error) {
@@ -175,48 +158,32 @@ const confirmDelete = async (productId) => {
   }
 };
 
-// Show success message for a few seconds
 const showSuccessMessage = (message) => {
   successMessage.value = message;
-  setTimeout(() => {
-    successMessage.value = "";
-  }, 3000);
+  setTimeout(() => { successMessage.value = ""; }, 3000);
 };
 
-// Load and filter products
 const loadProducts = async () => {
   try {
     const authToken = authStore.token;
-
     if (!authToken) {
       alert("You need to log in first.");
       router.push('/signin');
       return;
     }
-    const response = await axios.get(`${api.baseURL}/products`,{
-      headers: {
-        Authorization: `Bearer ${authToken}`, // Ensure the correct format
-        Accept: 'application/json', // Sometimes required for Laravel-based APIs
-      },
-      withCredentials: true, // Important if using Laravel Sanctum
-    });
-    const allProducts = response.data;
 
-    // Filter products based on activeTab (categoryId)
-    products.value = props.activeTab ? allProducts.filter((p) => p.category_id === props.activeTab) : allProducts;
+    const response = await axios.get(`${api.baseURL}/products`, {
+      headers: { Authorization: `Bearer ${authToken}` },
+      withCredentials: true,
+    });
+
+    products.value = response.data;
   } catch (error) {
     console.error("Error fetching products:", error);
     products.value = [];
   }
 };
 
-// Fetch products before component mounts
-onBeforeMount(() => {
-  loadProducts();
-});
-
-// Watch for changes in activeTab to re-filter products
-watchEffect(() => {
-  loadProducts();
-});
+onBeforeMount(() => { loadProducts(); });
+watchEffect(() => { loadProducts(); });
 </script>
