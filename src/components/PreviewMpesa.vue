@@ -81,8 +81,9 @@ import { defineProps, defineEmits, ref, watch, inject } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../store/auth';
+import api from '../api';
 
-const HTTPS_MPESA = 'https://spencer-russia-agrees-spears.trycloudflare.com/api';
+//const HTTPS_MPESA = 'https://spencer-russia-agrees-spears.trycloudflare.com/api';
 
 const props = defineProps({
     isOpen: Boolean,
@@ -124,7 +125,7 @@ const submitForm = async () => {
             return;
         }
 
-        const response = await axios.post(`${HTTPS_MPESA}/stkpush`, {
+        const response = await axios.post(`${api.baseURL}/stkpush`, {
             amount: amount.value,
             phone: props.orderNo,
             account_number: '12345',
