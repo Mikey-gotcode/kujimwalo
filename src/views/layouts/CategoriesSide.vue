@@ -6,12 +6,12 @@ const menuItems = ref({
   items: [
     {
       label: "Dashboard",
-      icon: "../../assets/icons/profile-user-svgrepo.svg",
+      icon: "../../assets/icons/profile-user-svgrepo-com.svg",
       link: "/admin"
     },
     {
       label: "Manage stock",
-      icon: "../../assets/icons/wine-svgrepo-com.svg",
+      icon: "../../assets/icons/wine-svgrepo-com(1).svg",
       link: "/admin/adminstock",
       badge: {
         text: "3",
@@ -25,7 +25,7 @@ const menuItems = ref({
     },
     {
       label: "Settings",
-      icon: "../../assets/icons/setting-tools-and-utensils-svgrepo-com.svg",
+      icon: "../../assets/icons/settings-tools-and-utensils-svgrepo-com.svg",
       link: "/admin/settings"
     },
     {
