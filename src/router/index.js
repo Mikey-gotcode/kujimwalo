@@ -14,7 +14,7 @@ import UserCSettings from '../views/pages/admin/users/UserSettings.vue'
 //staff routes
 import CategoriesDashboardStaff from '../views/pages/products/categories/CategoriesDashboardStaff.vue'
 import ManageSOrders from '../views/pages/admin/ManageOrders.vue'
-import StaffProfile from '../views/pages/admin/staff/StaffProfile.vue'
+import StaffDashboard from '../views/pages/admin/staff/StaffDashboard.vue'
 import UserSSettings from '../views/pages/admin/staff/UserSettings.vue'
 
 
@@ -62,7 +62,7 @@ const routes =[
         component:CategoryIndex,
         children:[
             {path:'/staff',redirect:'/staff/categories-dashboard'},
-            {path:'profile',component:StaffProfile},
+            {path:'profile',component:StaffDashboard},
             {path:'categories-dashboard',component:CategoriesDashboardStaff},
             {path:'manageorders',component:ManageSOrders},
             {path:'settings',component:UserSSettings}

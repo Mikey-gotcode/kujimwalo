@@ -36,7 +36,7 @@
         </div>
 
         <!-- profile modal section -->
-        <div>
+        <!-- <div>
           <div class="p-5 mb-6 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
             <div class="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
               <div>
@@ -111,7 +111,7 @@
               </div>
             </template>
           </Modal>
-        </div>
+        </div> -->
         <!-- profile modal section -->
       </div>
     </div>
