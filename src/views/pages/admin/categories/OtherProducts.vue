@@ -3,7 +3,7 @@
     <div v-for="product in products" :key="product.id"
       class="bg-white rounded-lg shadow-md transition hover:shadow-lg p-4">
       <div class="relative">
-        <img :src="product.image" :alt="product.name" class="w-full h-48 object-cover rounded-lg" />
+        <img :src="product.image_path" :alt="product.name" class="w-full h-48 object-cover rounded-lg" />
       </div>
 
       <div class="p-4 min-h-[400px]">
@@ -12,6 +12,7 @@
         </h3>
         <p class="text-gray-600 text-sm">Category ID: {{ product.category_id }}</p>
         <p class="text-gray-600 text-sm">Last Restocked: {{ product.last_restocked }}</p>
+        <p class="text-gray-600 text-sm">Stock Quantity:{{ product.stock_quantity }}</p>
         <div class="flex justify-between items-center mt-2">
           <span class="text-xl font-bold text-blue-600">${{ product.price }}</span>
           <span :class="isInStock(product) ? 'text-green-500' : 'text-red-500'">
@@ -112,6 +113,9 @@ const saveChanges = async () => {
   }
 
   try {
+    const authToken = authStore.token
+
+
     const formData = new FormData();
 
     formData.append("name", selectedProduct.value.name);
