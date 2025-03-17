@@ -1,21 +1,13 @@
 <script setup>
-import { ref, inject,  } from 'vue';
+import { inject } from 'vue';
 import ProductNav from '../products/ProductNav.vue';
 import CategoriesSide from '../../layouts/CategoriesSide.vue';
 import ProfileCard from './ProfileCard.vue';
+import AdminProfile from './AdminProfile.vue'
 
 // Inject theme
 const theme = inject('theme');
 
-// Reactive profile data
-const profile = ref({
- firstName: 'Rolands',
- lastName: 'Richard',
- username: 'rolandsr',
- email: 'rolands@example.com',
- phoneNumber: '+1234567890',
- bio: 'A passionate student learning Vue.js and Tailwind CSS.'
-});
 
 </script>
 
@@ -37,7 +29,7 @@ const profile = ref({
                             <h3 class="text-xl font-semibold"></h3>
                         </div>
                         <ProfileCard/>
-                        <CustomerProfile/>
+                        <AdminProfile/>
 
                        
 
