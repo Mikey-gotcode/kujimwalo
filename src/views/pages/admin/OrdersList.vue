@@ -29,7 +29,8 @@
       <div v-else>
         <div v-if="filteredOrders().length && filteredDates().length" class="space-y-6">
           <div v-for="order in filteredOrders()" :key="order.id"
-            class="border border-gray-300 dark:border-gray-700 rounded-lg p-6 shadow-md bg-gray-50 dark:bg-gray-800 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+             :class="theme === 'light' ? 'bg-gray-50 border-gray-300' : 'bg-gray-800 border-gray-700'"
+            class="border rounded-lg p-6 shadow-md flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             
             <div class="flex flex-col md:flex-row md:items-center md:gap-6 w-full">
               <p :class="theme === 'light' ? 'text-black' : 'text-white'"  class="text-lg font-semibold">Order:#{{ order.id }}</p>
@@ -39,10 +40,10 @@
             </div>
             
             <div class="mt-2 w-full">
-              <p :class="theme === 'light' ? 'text-gray-900' : 'text-white'"
+              <p :class="theme === 'light' ? 'text-black' : 'text-white'"
                   class="text-lg font-bold">Items:</p>
               <ul class="list-disc pl-5 font-bold text-lg"
-                  :class="theme === 'light' ? 'text-gray-900' : 'text-white'">
+                  :class="theme === 'light' ? 'text-black' : 'text-white'">
                 <li v-for="item in order.items" :key="item.product_id">{{ item.product_name }} [{{ item.quantity }}]</li>
               </ul>
             </div>
