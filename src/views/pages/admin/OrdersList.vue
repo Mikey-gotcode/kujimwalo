@@ -1,5 +1,6 @@
 <template>
-  <section class="bg-white dark:bg-gray-900 py-8 md:py-16">
+  <section :class="{ 'bg-white text-gray-900': theme === 'light', 'bg-gray-700 text-gray-200': theme === 'dark' }"
+            class="py-8 md:py-16">
     <div class="max-w-screen-xl mx-auto px-4">
       <div class="flex justify-between items-center mb-6">
         <h2 :class="theme === 'light' ? 'text-gray-900' : 'text-white'"
