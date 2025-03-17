@@ -50,7 +50,7 @@ const routes =[
         component:AdminIndex,
         children:[
             {path:'/admin',redirect:'/admin/admindashboard'},
-            {path:'admindashboard',component:AdminDashboard},
+            {path:'profile',component:AdminDashboard},
             {path:'adminstock',component:AdminStock },
             {path:'manageorders',component:ManageOrders},
             {path:'settings',component:AdminSettings},
