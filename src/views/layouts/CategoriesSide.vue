@@ -6,12 +6,12 @@ const menuItems = ref({
   items: [
     {
       label: "Dashboard",
-      icon: "../../assets/icons/cancer-svgrepo-com.svg",
+      icon: "../../assets/icons/profile-user-svgrepo.svg",
       link: "/admin"
     },
     {
       label: "Manage stock",
-      icon: "../../assets/icons/inbox-arrow-down-svgrepo-com.svg",
+      icon: "../../assets/icons/wine-svgrepo-com.svg",
       link: "/admin/adminstock",
       badge: {
         text: "3",
@@ -20,17 +20,17 @@ const menuItems = ref({
     },
     {
       label: "Manage orders ",
-      icon: "../../assets/icons/inbox-arrow-down-svgrepo-com.svg",
+      icon: "../../assets/icons/inbox-svgrepo-com.svg",
       link: "/admin/manageorders"
     },
     {
       label: "Settings",
-      icon: "../../assets/icons/bottle-of-martini-martini-alcohol-drink-svgrepo-com.svg",
+      icon: "../../assets/icons/setting-tools-and-utensils-svgrepo-com.svg",
       link: "/admin/settings"
     },
     {
       label: "QR CODE",
-      icon: "../../assets/icons/bottle-of-martini-martini-alcohol-drink-svgrepo-com.svg",
+      icon: "../../assets/icons/qr-code-svgrepo-com.svg",
       link: "/admin/qrcode"
     }
   ]
