@@ -3,8 +3,8 @@
             class="py-8 md:py-16">
     <div class="max-w-screen-xl mx-auto px-4">
       <div class="flex justify-between items-center mb-6">
-        <h2 :class="theme === 'light' ? 'text-gray-900' : 'text-white'"
-            class="text-2xl font-semibold text-gray-900 dark:text-white">My Orders</h2>
+        <h2 :class="theme === 'light' ? 'text-black' : 'text-white'"
+            class="text-2xl font-semibold ">My Orders</h2>
 
 
         <div class="flex gap-4">
