@@ -12,7 +12,7 @@ const menuItems = ref({
     {
       label: "Manage stock",
       icon: "../../assets/icons/wine-svgrepo-com(1).svg",
-      link: "/admin/adminstock",
+      link: "/admin/stock",
       badge: {
         text: "3",
         class: "bg-blue-500 text-white"
@@ -21,7 +21,7 @@ const menuItems = ref({
     {
       label: "Manage orders ",
       icon: "../../assets/icons/inbox-svgrepo-com.svg",
-      link: "/admin/manageorders"
+      link: "/admin/orders"
     },
     {
       label: "Settings",

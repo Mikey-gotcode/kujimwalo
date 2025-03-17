@@ -49,10 +49,10 @@ const routes =[
         path:'/admin',
         component:AdminIndex,
         children:[
-            {path:'/admin',redirect:'/admin/admindashboard'},
+            {path:'/admin',redirect:'/admin/profile'},
             {path:'profile',component:AdminDashboard},
-            {path:'adminstock',component:AdminStock },
-            {path:'manageorders',component:ManageOrders},
+            {path:'stock',component:AdminStock },
+            {path:'orders',component:ManageOrders},
             {path:'settings',component:AdminSettings},
             {path:'qrcode',component:QRComponent}
         ]
