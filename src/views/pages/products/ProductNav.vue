@@ -1,6 +1,8 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted,inject } from 'vue'
 import navigationData from '../../../assets/json/navigation.json'
+
+const theme = inject("theme")
 
 const navigation = ref(null)
 const isMenuOpen = ref(false)
@@ -11,7 +13,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <nav class="bg-white dark:bg-gray-800 antialiased">
+  <nav class="antialiased"
+      :class="{ 'bg-white text-gray-900': theme === 'light', 'bg-gray-700 text-gray-200': theme === 'dark' }">
     <div class="max-w-screen-xl px-4 mx-auto py-4">
       <div class="flex items-center justify-between">
         <!-- Brand -->

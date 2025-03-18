@@ -1,90 +1,105 @@
 <template>
-    <ProductNav /> 
-    <div class="page-content py-8" :class="{ 'bg-gray-100 text-black': theme === 'light', 'bg-gray-900 text-white': theme === 'dark' }">
-      <div class="container mx-auto px-4">
-        <div class="flex flex-col lg:flex-row gap-6">
+  <ProductNav /> 
+  <div class="page-content py-8" :class="{ 'bg-gray-100 text-black': theme === 'light', 'bg-gray-900 text-white': theme === 'dark' }">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-col lg:flex-row gap-6">
+        <div class="flex ml-6 pl-6">
+          <CategoriesSide />
+        </div>
 
-          <!-- sidebar -->
-          <div class="flex">
-            <CategoriesSide />
-          </div>
-  
-          <div class="flex-1 p-4">
-            <div class="shadow-md rounded-lg p-6 "
-            :class="{ 'bg-white text-gray-900': theme === 'light', 'bg-gray-700 text-gray-200': theme === 'dark' }">
-  
-              <!-- View Cart Button (Fixed at Bottom) -->
-              <button 
-                v-if="cart.length" 
-                @click="toggleCart" 
-                class="fixed bottom-5 right-5 md:right-10 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 md:py-4 md:px-5 rounded-lg shadow-lg transition"
-                :class="{ 'bg-blue-500 text-white': theme === 'light', 'bg-blue-400 text-black': theme === 'dark' }"
-              >
-                View Cart ({{ cart.length }})
-              </button>
-  
-              <div class="border-b pb-4 mb-4"
-              :class="{ 'border-gray-300': theme === 'light', 'border-gray-600': theme === 'dark' }">
-                <h3 class="text-xl font-semibold">Products</h3>
-              </div>
-              
-              <!-- Tab Navigation -->
-              <div class="overflow-x-auto">
-                <ul class="flex border-b whitespace-nowrap"
-                :class="{ 'border-gray-300': theme === 'light', 'border-gray-600': theme === 'dark' }">
-                  <li 
-                    v-for="tab in tabs" 
-                    :key="tab.id"
-                    @click="selectTab(tab.id)"
-                    class="mr-4 hover:cursor-pointer py-2 px-4 font-semibold transition-colors duration-300"
-                    :class="selectedTab === tab.id ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-600 hover:text-blue-600'"
-                  >
-                    {{ tab.label }} ({{ tab.count }})
-                  </li>
-                </ul>
-              </div>
-              
-              <!-- Tab Content -->
-              <div class="mt-4" v-for="tab in tabs" :key="tab.label">
-                <OtherProducts v-if="selectedTab === tab.id" :activeTab="currentTab"  ref="hDrinkNumb"/>
-              </div>
+        <div class="flex-1 p-4">
+          <div class="shadow-md rounded-lg p-6 "
+          :class="{ 'bg-white text-gray-900': theme === 'light', 'bg-gray-700 text-gray-200': theme === 'dark' }">
+
+            <!-- View Cart Button (Fixed at Bottom) -->
+            <button 
+              v-if="cart.length" 
+              @click="toggleCart" 
+              class="fixed bottom-5 right-5 md:right-10 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 md:py-4 md:px-5 rounded-lg shadow-lg transition"
+              :class="{ 'bg-blue-500 text-white': theme === 'light', 'bg-blue-400 text-black': theme === 'dark' }"
+            >
+              View Cart ({{ cart.length }})
+            </button>
+
+            <div class="border-b pb-4 mb-4"
+            :class="{ 'border-gray-300': theme === 'light', 'border-gray-600': theme === 'dark' }">
+              <h3 class="text-xl font-semibold">Products</h3>
             </div>
             
-            <!-- Teleported Cart -->
-            <Teleport to="body">
-              <div v-if="showCart" class="fixed top-5 right-5 w-11/12 md:w-96 bg-white rounded-lg shadow-lg p-4 border border-gray-200">
-                <div class="flex justify-between items-center">
-                  <h2 class="text-lg md:text-xl font-bold">Cart</h2>
-                  <button @click="showCart = false" class="text-blue-500 hover:underline">Close</button>
+            <!-- Tab Navigation -->
+            <div v-if="loading" class="flex justify-center items-center">
+                  <div aria-label="Loading..." role="status" class="flex items-center space-x-2">
+                    <svg class="h-20 w-20 animate-spin stroke-gray-500" viewBox="0 0 256 256">
+                        <line x1="128" y1="32" x2="128" y2="64" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
+                        <line x1="195.9" y1="60.1" x2="173.3" y2="82.7" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
+                        <line x1="224" y1="128" x2="192" y2="128" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
+                        <line x1="195.9" y1="195.9" x2="173.3" y2="173.3" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
+                        <line x1="128" y1="224" x2="128" y2="192" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
+                        <line x1="60.1" y1="195.9" x2="82.7" y2="173.3" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
+                        <line x1="32" y1="128" x2="64" y2="128" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
+                        <line x1="60.1" y1="60.1" x2="82.7" y2="82.7" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
+                    </svg>
+                    <span class="text-4xl font-medium text-gray-500">Loading...</span>
+                  </div>
                 </div>
-                <ul>
-                  <li v-for="item in cart" :key="item.id" class="flex justify-between items-center mt-3">
-                    <span class="text-sm md:text-base">{{ item.name }} ({{ item.quantity }})</span>
-                    <button @click="removeFromCart(item.id)" class="text-blue-500 hover:underline text-sm md:text-base">Remove</button>
-                  </li>
-                </ul>
-                <button @click="checkout" class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 md:py-3 rounded-lg shadow-md transition">
-                  Proceed to Checkout
-                </button>
-              </div>
-            </Teleport>
-            
-            <!-- Pagination -->
-            <div class="mt-6 flex flex-col sm:flex-row justify-between items-center">
-              <p class="text-gray-700">Page 1 of 2</p>
-              <ul class="flex space-x-2 mt-2 sm:mt-0">
-                <li class="bg-blue-600 text-white px-3 py-1 rounded-md">1</li>
-                <li class="bg-gray-200 hover:bg-blue-600 hover:text-white px-3 py-1 rounded-md cursor-pointer">2</li>
-                <li class="bg-gray-200 hover:bg-blue-600 hover:text-white px-3 py-1 rounded-md cursor-pointer">
-                  <i class="bx bx-chevron-right"></i>
+              <div v-else-if="error" class="text-center text-red-600">{{ error }}</div>
+
+            <div v-else class="overflow-x-auto">
+              <ul class="flex border-b whitespace-nowrap"
+              :class="{ 'border-gray-300': theme === 'light', 'border-gray-600': theme === 'dark' }">
+                <li 
+                  v-for="tab in tabs" 
+                  :key="tab.id"
+                  @click="selectTab(tab.id)"
+                  class="mr-4 hover:cursor-pointer py-2 px-4 font-semibold transition-colors duration-300"
+                  :class="selectedTab === tab.id ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-600 hover:text-blue-600'"
+                >
+                  {{ tab.label }} ({{ tab.count }})
                 </li>
               </ul>
             </div>
+            
+            <!-- Tab Content -->
+            <div class="mt-4" v-for="tab in tabs" :key="tab.label">
+              <OtherProducts v-if="selectedTab === tab.id" :activeTab="currentTab"  ref="hDrinkNumb"/>
+            </div>
+          </div>
+          
+          <!-- Teleported Cart -->
+          <Teleport to="body">
+            <div v-if="showCart" class="fixed top-5 right-5 w-11/12 md:w-96 bg-white rounded-lg shadow-lg p-4 border border-gray-200">
+              <div class="flex justify-between items-center">
+                <h2 class="text-lg md:text-xl font-bold">Cart</h2>
+                <button @click="showCart = false" class="text-blue-500 hover:underline">Close</button>
+              </div>
+              <ul>
+                <li v-for="item in cart" :key="item.id" class="flex justify-between items-center mt-3">
+                  <span class="text-sm md:text-base">{{ item.name }} ({{ item.quantity }})</span>
+                  <button @click="removeFromCart(item.id)" class="text-blue-500 hover:underline text-sm md:text-base">Remove</button>
+                </li>
+              </ul>
+              <button @click="checkout" class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 md:py-3 rounded-lg shadow-md transition">
+                Proceed to Checkout
+              </button>
+            </div>
+          </Teleport>
+          
+          <!-- Pagination -->
+          <div class="mt-6 flex flex-col sm:flex-row justify-between items-center">
+            <p class="text-gray-700">Page 1 of 2</p>
+            <ul class="flex space-x-2 mt-2 sm:mt-0">
+              <li class="bg-blue-600 text-white px-3 py-1 rounded-md">1</li>
+              <li class="bg-gray-200 hover:bg-blue-600 hover:text-white px-3 py-1 rounded-md cursor-pointer">2</li>
+              <li class="bg-gray-200 hover:bg-blue-600 hover:text-white px-3 py-1 rounded-md cursor-pointer">
+                <i class="bx bx-chevron-right"></i>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
     </div>
-  </template>
+  </div>
+</template>
   
   <script setup>
   import { ref, onMounted, computed, nextTick, inject } from 'vue';
@@ -110,10 +125,16 @@
   
   // Inject theme
   const theme = inject("theme");
+
+  const loading = ref(true);
+const error = ref(null);
+
   
   
   // Fetch categories and dynamically create categoryMap
   const fetchCategories = async () => {
+    loading.value = true;
+    error.value = null;
     try {
       const authToken = authStore.token
   
@@ -147,7 +168,10 @@
       }
   
     } catch (error) {
-      console.error('Error fetching categories:', error);
+    error.value = "Failed to fetch products. Please try again later.";
+    console.error('Error fetching categories:', error);
+    }finally {
+      loading.value = false;
     }
   };
   

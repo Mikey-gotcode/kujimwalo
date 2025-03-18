@@ -37,7 +37,23 @@
             </div>
 
             <!-- Tab Navigation -->
-            <div>
+            <div v-if="loading" class="flex justify-center items-center">
+        <div aria-label="Loading..." role="status" class="flex items-center space-x-2">
+          <svg class="h-20 w-20 animate-spin stroke-gray-500" viewBox="0 0 256 256">
+              <line x1="128" y1="32" x2="128" y2="64" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
+              <line x1="195.9" y1="60.1" x2="173.3" y2="82.7" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
+              <line x1="224" y1="128" x2="192" y2="128" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
+              <line x1="195.9" y1="195.9" x2="173.3" y2="173.3" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
+              <line x1="128" y1="224" x2="128" y2="192" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
+              <line x1="60.1" y1="195.9" x2="82.7" y2="173.3" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
+              <line x1="32" y1="128" x2="64" y2="128" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
+              <line x1="60.1" y1="60.1" x2="82.7" y2="82.7" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
+          </svg>
+          <span class="text-4xl font-medium text-gray-500">Loading...</span>
+        </div>
+      </div>
+    <div v-else-if="error" class="text-center text-red-600">{{ error }}</div>
+            <div v-else>
               <ul class="flex flex-wrap border-b"
                 :class="{ 'border-gray-300': theme === 'light', 'border-gray-600': theme === 'dark' }">
                 <li v-for="tab in tabs" :key="tab.id"
@@ -83,6 +99,9 @@ const hDrinkNumb = ref(null);
 const authStore = useAuthStore()
 const router = useRouter()
 
+const loading = ref(true);
+const error = ref(null);
+
 const tabs = ref([]);
 const categoryMap = ref({});
 const selectedTab = ref(null);
@@ -94,6 +113,8 @@ const theme = inject("theme");
 //const toggleTheme = inject("toggleTheme");
 
 const fetchCategories = async () => {
+  loading.value = true;
+  error.value = null;
   try {
     const authToken = authStore.token;
 
@@ -122,7 +143,10 @@ const fetchCategories = async () => {
       selectedTab.value = tabs.value[0].id;
     }
   } catch (error) {
+    error.value = "Failed to fetch products. Please try again later.";
     console.error('Error fetching categories:', error);
+  }finally {
+    loading.value = false;
   }
 };
 

@@ -69,10 +69,10 @@
             <form class="flex flex-col">
               <div class="custom-scrollbar h-[458px] overflow-y-auto p-2">
               <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-                <div v-for="(link, key) in socialLinks" :key="key">
+                <!-- <div v-for="(link, key) in socialLinks" :key="key">
                   <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">{{ link.label }}</label>
                   <input type="text" v-model="link.value" class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
-                </div>
+                </div> -->
                 <div v-for="(info, index) in personalInfo" :key="index">
                   <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                     {{ info.label }}
@@ -112,23 +112,24 @@
   <script setup>
   import { ref, inject } from 'vue'
   import Modal from './Modal.vue'
+  import { useAuthStore } from '../../../../store/auth';
   
+
   const isProfileInfoModal = ref(false)
   const theme = inject('theme');
+  const authStore = useAuthStore()
 
   const personalInfo = ref([
-  { label: 'First Name', value: 'Musharof' },
-  { label: 'Last Name', value: 'Chowdhury' },
-  { label: 'Email address', value: 'randomuser@pimjo.com' },
-  { label: 'Phone', value: '+09 363 398 46' },
-  { label: 'Bio', value: 'Team Manager' }
+  { label: 'First Name', value:authStore.user.name },
+  { label: 'Email address', value: authStore.user.email },
+  { label: 'Phone', value: authStore.user.phone },
 ]);
 
-const socialLinks = ref([
-  { label: 'Facebook', value: '' },
-  { label: 'Twitter', value: '' },
-  { label: 'LinkedIn', value: '' },
-]);
+// const socialLinks = ref([
+//   { label: 'Facebook', value: '' },
+//   { label: 'Twitter', value: '' },
+//   { label: 'LinkedIn', value: '' },
+// ]);
   
   const saveProfile = () => {
     // Implement save profile logic here

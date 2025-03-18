@@ -1,5 +1,22 @@
 <template>
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+     <div v-if="loading" class="flex justify-center items-center">
+        <div aria-label="Loading..." role="status" class="flex items-center space-x-2">
+          <svg class="h-20 w-20 animate-spin stroke-gray-500" viewBox="0 0 256 256">
+              <line x1="128" y1="32" x2="128" y2="64" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
+              <line x1="195.9" y1="60.1" x2="173.3" y2="82.7" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
+              <line x1="224" y1="128" x2="192" y2="128" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
+              <line x1="195.9" y1="195.9" x2="173.3" y2="173.3" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
+              <line x1="128" y1="224" x2="128" y2="192" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
+              <line x1="60.1" y1="195.9" x2="82.7" y2="173.3" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
+              <line x1="32" y1="128" x2="64" y2="128" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
+              <line x1="60.1" y1="60.1" x2="82.7" y2="82.7" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
+          </svg>
+          <span class="text-4xl font-medium text-gray-500">Loading...</span>
+        </div>
+      </div>
+    <div v-else-if="error" class="text-center text-red-600">{{ error }}</div>
+    <div v-else-if="products.length === 0" class="text-center text-gray-600">No products found.</div>
+  <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
     <div v-for="product in products" :key="product.id"
       class="bg-white rounded-lg shadow-md transition hover:shadow-lg p-4">
       <div class="relative">
@@ -79,6 +96,8 @@ const props = defineProps({
 });
 
 const products = ref([]);
+const loading = ref(true);
+const error = ref(null);
 const selectedProduct = ref(null);
 const successMessage = ref("");
 const imageFile = ref(null); // Store the image file
@@ -189,28 +208,29 @@ const showSuccessMessage = (message) => {
 
 // Load and filter products
 const loadProducts = async () => {
+  loading.value = true;
+  error.value = null;
   try {
     const authToken = authStore.token;
-
     if (!authToken) {
-      alert("You need to log in first.");
-      router.push('/signin');
+      error.value = "You need to log in first.";
+      router.push("/signin");
       return;
     }
-    const response = await axios.get(`${api.baseURL}/products`,{
+    const response = await axios.get(`${api.baseURL}/products`, {
       headers: {
-        Authorization: `Bearer ${authToken}`, // Ensure the correct format
-        Accept: 'application/json', // Sometimes required for Laravel-based APIs
+        Authorization: `Bearer ${authToken}`,
+        Accept: "application/json",
       },
-      withCredentials: true, // Important if using Laravel Sanctum
+      withCredentials: true,
     });
     const allProducts = response.data;
-
-    // Filter products based on activeTab (categoryId)
     products.value = props.activeTab ? allProducts.filter((p) => p.category_id === props.activeTab) : allProducts;
-  } catch (error) {
-    console.error("Error fetching products:", error);
-    products.value = [];
+  } catch (err) {
+    error.value = "Failed to fetch products. Please try again later.";
+    console.error("Error fetching products:", err);
+  } finally {
+    loading.value = false;
   }
 };
 

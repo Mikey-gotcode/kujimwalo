@@ -14,7 +14,7 @@ export default defineConfig({
     allowedHosts: [
       "localhost",
       "https://assuming-severe-accidents-locking.trycloudflare.com",//backend api cor cors
-      "equal-enb-ict-employers.trycloudflare.com"
+      "oman-exhibits-advertiser-cabinets.trycloudflare.com"
     ],
     cors: true, // Enable CORS for external access
   },

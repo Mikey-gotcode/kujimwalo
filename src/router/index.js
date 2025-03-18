@@ -13,7 +13,7 @@ import UserCSettings from '../views/pages/admin/users/UserSettings.vue'
 
 //staff routes
 import CategoriesDashboardStaff from '../views/pages/products/categories/CategoriesDashboardStaff.vue'
-import ManageSOrders from '../views/pages/admin/ManageOrders.vue'
+import ManageSOrders from '../views/pages/admin/ManageSOrder.vue'
 import StaffDashboard from '../views/pages/admin/staff/StaffDashboard.vue'
 import UserSSettings from '../views/pages/admin/staff/UserSettings.vue'
 

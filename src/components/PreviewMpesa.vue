@@ -5,25 +5,34 @@
                 class="p-6 rounded-lg shadow-lg w-96"
                 :class="{'bg-white text-gray-900': theme === 'light', 'bg-gray-800 text-gray-200': theme === 'dark'}">
                 
-                <!-- Input Field -->
+                <!-- Amount Input Field -->
                 <input 
                     type="text" 
                     v-model="amount" 
                     class="w-full mb-4 p-2 border rounded text-lg text-center"
                     :class="{'bg-white text-gray-900 border-gray-300': theme === 'light', 'bg-gray-700 text-gray-200 border-gray-600': theme === 'dark'}"
-                    readonly
+                    @focus="editingField = 'amount'"
+                />
+                
+                <!-- Phone Input Field -->
+                <input 
+                    type="text" 
+                    v-model="phone" 
+                    class="w-full mb-4 p-2 border rounded text-lg text-center"
+                    :class="{'bg-white text-gray-900 border-gray-300': theme === 'light', 'bg-gray-700 text-gray-200 border-gray-600': theme === 'dark'}"
+                    @focus="editingField = 'phone'"
                 />
 
                 <!-- Keypad Grid -->
                 <div class="grid grid-cols-3 gap-2">
                     <button 
                         v-for="number in numbers" 
-                        :key="number.id" 
-                        @click.prevent="appendNumber(number.value)"
+                        :key="number" 
+                        @click.prevent="append(number)"
                         class="p-4 font-bold rounded hover:bg-opacity-80 focus:outline-none"
                         :class="{'bg-gray-200 text-gray-900 hover:bg-gray-300': theme === 'light', 'bg-gray-700 text-gray-200 hover:bg-gray-600': theme === 'dark'}"
                     >
-                        {{ number.value }}
+                        {{ number }}
                     </button>
 
                     <!-- Backspace Button -->
@@ -37,7 +46,7 @@
 
                     <!-- Clear Button -->
                     <button 
-                        @click.prevent="clearInput"
+                        @click.prevent="clear"
                         class="p-4 text-white font-bold rounded hover:bg-opacity-80 focus:outline-none"
                         :class="{'bg-gray-500 hover:bg-gray-600': theme === 'light', 'bg-gray-600 hover:bg-gray-700': theme === 'dark'}"
                     >
@@ -64,14 +73,6 @@
                     Close
                 </button>
             </form>
-
-            <!-- Alert Message -->
-            <div v-if="alertMessage" 
-                class="fixed top-5 right-5 px-4 py-2 rounded shadow"
-                :class="{'bg-blue-500 text-white': theme === 'light', 'bg-blue-700 text-gray-100': theme === 'dark'}"
-            >
-                {{ alertMessage }}
-            </div>
         </div>
     </teleport>
 </template>
@@ -82,8 +83,6 @@ import axios from 'axios';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../store/auth';
 import api from '../api';
-
-//const HTTPS_MPESA = 'https://spencer-russia-agrees-spears.trycloudflare.com/api';
 
 const props = defineProps({
     isOpen: Boolean,
@@ -96,25 +95,51 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'paymentSuccess']);
 const router = useRouter();
-const authStore = useAuthStore()
-
-// Inject theme
+const authStore = useAuthStore();
 const theme = inject('theme');
 
-const numbers = ref([...Array(10).keys()].map(i => ({ id: i, value: i }))); 
-const alertMessage = ref('');
-const amount = ref(props.billAmount || 0);
+const numbers = ref([...Array(10).keys()]); 
+const amount = ref(props.billAmount?.toString() || '');
+const phone = ref(props.orderNo || '');
+const editingField = ref('amount');
 
-watch(() => props.billAmount, (newAmount) => {
-    amount.value = newAmount;
+watch(() => props.orderNo, (newPhone) => {
+    phone.value = newPhone;
 });
 
+watch(() => props.billAmount, (newAmount) => {
+    amount.value = newAmount?.toString() || '';
+});
+
+const append = (num) => {
+    if (editingField.value === 'amount') {
+        amount.value = amount.value === '0' ? num.toString() : amount.value + num.toString();
+    } else {
+        phone.value += num.toString();
+    }
+};
+
+const removeLastDigit = () => {
+    if (editingField.value === 'amount') {
+        amount.value = amount.value.slice(0, -1) || "0";
+    } else {
+        phone.value = phone.value.slice(0, -1);
+    }
+};
+
+const clear = () => {
+    if (editingField.value === 'amount') {
+        amount.value = '0';
+    } else {
+        phone.value = '';
+    }
+};
+
 const submitForm = async () => {
-    if (!amount.value || isNaN(amount.value)) {
-        showAlert("Please enter a valid amount");
+    if (!amount.value || isNaN(parseInt(amount.value))) {
+        alert("Please enter a valid amount");
         return;
     }
-    console.log("order custoomern",props.orderNo)
 
     try {
         const authToken = authStore.token;
@@ -126,8 +151,8 @@ const submitForm = async () => {
         }
 
         const response = await axios.post(`${api.baseURL}/stkpush`, {
-            amount: amount.value,
-            phone: props.orderNo,
+            amount: parseInt(amount.value),
+            phone: phone.value,
             account_number: '12345',
             order_id: props.orderID
         },
@@ -140,35 +165,15 @@ const submitForm = async () => {
         });
 
         if (response.data.success) {
-            showAlert(response.data.message || "Payment successful");
+            alert(response.data.message || "Payment successful");
             emit('paymentSuccess');
             setTimeout(() => closeModal(), 2000);
         } else {
-            showAlert(`Payment failed: ${response.data.message}`);
+            alert(`Payment failed: ${response.data.message}`);
         }
     } catch (error) {
-        console.log(error)
-        showAlert(error.response?.data || "Payment failed");
+        alert(error.response?.data || "Payment failed");
     }
-};
-
-const appendNumber = (num) => {
-    amount.value += num;
-};
-
-const removeLastDigit = () => {
-    amount.value = amount.value.slice(0, -1);
-};
-
-const clearInput = () => {
-    amount.value = "";
-};
-
-const showAlert = (message) => {
-    alertMessage.value = message;
-    setTimeout(() => {
-        alertMessage.value = "";
-    }, 5000);
 };
 
 const closeModal = () => {

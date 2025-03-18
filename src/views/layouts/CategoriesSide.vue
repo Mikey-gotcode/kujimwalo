@@ -38,7 +38,7 @@ const menuItems = ref({
 </script>
 
 <template>
-  <aside class="w-64 bg-gray-900 text-white min-h-auto shadow-lg px-4 lg:block" :class="{ 'hidden': !isMenuOpen, 'block': isMenuOpen }">
+  <aside class="w-64 bg-gray-900 text-white min-h-auto shadow-lg px-4 lg:block" :class="{ 'hidden': !isMenuOpen, 'block': isMenuOpen ,}">
     <nav>
       <ul>
         <li v-for="item in menuItems.items" :key="item.label" class="py-3">
