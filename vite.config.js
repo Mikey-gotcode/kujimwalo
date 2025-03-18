@@ -13,8 +13,8 @@ export default defineConfig({
     port: 5173, // Ensure this matches your dev server port
     allowedHosts: [
       "localhost",
-      "https://machinery-pull-film-assigned.trycloudflare.com",//backend api cor cors
-      "clause-worm-plate-payments.trycloudflare.com"
+      "https://assuming-severe-accidents-locking.trycloudflare.com",//backend api cor cors
+      "equal-enb-ict-employers.trycloudflare.com"
     ],
     cors: true, // Enable CORS for external access
   },
