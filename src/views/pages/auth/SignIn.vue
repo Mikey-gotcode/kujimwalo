@@ -54,9 +54,16 @@
                 </div>
                 <a href="#" class="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500">Forgot password?</a>
               </div>
-              <button type="submit" class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
-                Sign in
-              </button>
+              <!-- Sign-in Button with Loading Spinner -->
+              <button type="submit" :disabled="isLoading" 
+                    class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg border border-gray-300 text-sm px-5 py-2.5 flex items-center justify-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+              <svg v-if="isLoading" class="animate-spin h-5 w-5 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4l-3 3-3-3h4z"></path>
+              </svg>
+              <span v-if="!isLoading">Sign in</span>
+              <span v-else>Signing in...</span>
+            </button>
               <p class="text-sm font-light text-gray-500 dark:text-gray-400">
                 Don’t have an account yet? <router-link to="/signup" class="font-medium text-primary-600 hover:underline dark:text-primary-500">Sign up</router-link>
               </p>
@@ -85,10 +92,11 @@ const router = useRouter(); // Declare router here
 const errorMessage = ref("");
 const showPassword = ref(false);
 const authStore = useAuthStore()
+const isLoading = ref(false);
 
 const submitForm = async () => {
   errorMessage.value = ""; // Reset error message before submission
-
+  isLoading.value=true //start loading effect
   try {
     const response = await axios.post(`${api.baseURL}/login`, form, {
       headers: {
@@ -107,6 +115,8 @@ const submitForm = async () => {
     } else {
       errorMessage.value = "Network error. Please check your connection.";
     }
+  } finally {
+    isLoading.value = false; // Stop loading
   }
 };
 ;
