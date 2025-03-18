@@ -3,7 +3,9 @@
     <div class="page-content py-8" :class="{ 'bg-gray-100 text-black': theme === 'light', 'bg-gray-900 text-white': theme === 'dark' }">
       <div class="container mx-auto px-4">
         <div class="flex flex-col lg:flex-row gap-6">
-          <div class="lg:w-1/4 w-full">
+
+          <!-- sidebar -->
+          <div class="flex">
             <CategoriesSide />
           </div>
   
