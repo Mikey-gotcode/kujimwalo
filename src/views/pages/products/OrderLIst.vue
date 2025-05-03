@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted, defineProps, inject } from 'vue';
+import { ref, onMounted, onUnmounted, defineProps, inject, computed, watch } from 'vue';
 import axios from 'axios';
 import api from '../../../api';
 import { useAuthStore } from '../../../store/auth';
@@ -19,6 +19,8 @@ const selectedStatus = ref('All orders');
 const loading = ref(true);
 const error = ref(null);
 let intervalId = null;
+const currentPage = ref(1);
+const itemsPerPage = 5;
 
 // Inject theme from the provider
 const theme = inject('theme', ref('light')); // Default to light if not provided
@@ -53,15 +55,36 @@ const fetchOrders = async () => {
 
 onMounted(() => {
   fetchOrders();
-  intervalId = setInterval(fetchOrders, 12000);
+  //intervalId = setInterval(fetchOrders, 12000);
 });
 
 onUnmounted(() => {
   clearInterval(intervalId);
 });
 
-const filteredOrders = () => {
+const filteredOrders = computed(() => {
   return orders.value.filter(o => selectedStatus.value === 'All orders' || o.status === selectedStatus.value);
+});
+
+const totalPages = computed(() => {
+  return Math.max(1, Math.ceil(filteredOrders.value.length / itemsPerPage));
+});
+
+const paginatedOrders = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  return filteredOrders.value.slice(start, start + itemsPerPage);
+});
+
+const nextPage = () => {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++;
+  }
+};
+
+const prevPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value--;
+  }
 };
 
 const cancelOrder = async (id) => {
@@ -73,7 +96,7 @@ const cancelOrder = async (id) => {
       router.push('/signin');
       return;
     }
-    await axios.post(`${api.baseURL}/orders/${id}/cancel`, {
+    await axios.post(`${api.baseURL}/orders/${id}/cancel`, null, {
       headers: { Authorization: `Bearer ${authToken}`, Accept: 'application/json' },
       withCredentials: true,
     });
@@ -82,7 +105,13 @@ const cancelOrder = async (id) => {
     alert('Failed to cancel order');
   }
 };
+
+// Reset page when filteredOrders or selectedStatus change
+watch([filteredOrders, selectedStatus], () => {
+  currentPage.value = 1;
+});
 </script>
+
 
 <template>
     <section class="py-8 md:py-16"
@@ -101,70 +130,58 @@ const cancelOrder = async (id) => {
                     <option value="cancelled">Cancelled</option>
                 </select>
             </div>
+            <div v-if="totalPages > 1" class="flex justify-center mt-6 gap-4">
+          <button
+            @click="prevPage"
+            :disabled="currentPage === 1"
+            class="px-4 py-2 border rounded-md bg-blue-200 hover:bg-gray-300 disabled:opacity-50 hover:scale-105 transition-transform"
+          >
+            Prev
+          </button>
+          <span>Page {{ currentPage }} of {{ totalPages }}</span>
+          <button
+            @click="nextPage"
+            :disabled="currentPage === totalPages"
+            class="px-4 py-2 border rounded-md bg-blue-200 hover:bg-gray-300 disabled:opacity-50 hover:scale-105 transition-transform"
+          >
+            Next
+          </button>
+        </div>
 
             <div v-if="loading" class="flex justify-center items-center">
-                <div aria-label="Loading..." role="status" class="flex items-center space-x-2">
-                  <svg class="h-20 w-20 animate-spin stroke-gray-500" viewBox="0 0 256 256">
-                      <line x1="128" y1="32" x2="128" y2="64" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
-                      <line x1="195.9" y1="60.1" x2="173.3" y2="82.7" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
-                      <line x1="224" y1="128" x2="192" y2="128" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
-                      <line x1="195.9" y1="195.9" x2="173.3" y2="173.3" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
-                      <line x1="128" y1="224" x2="128" y2="192" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
-                      <line x1="60.1" y1="195.9" x2="82.7" y2="173.3" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
-                      <line x1="32" y1="128" x2="64" y2="128" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
-                      <line x1="60.1" y1="60.1" x2="82.7" y2="82.7" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
-                  </svg>
-                  <span class="text-4xl font-medium text-gray-500">Loading...</span>
-                </div>
-              </div>
-              <div v-else-if="error" class="text-red-500 text-center">{{ error }}</div>
+                <span class="text-4xl font-medium text-gray-500">Loading...</span>
+            </div>
+            <div v-else-if="error" class="text-red-500 text-center">{{ error }}</div>
 
             <div v-else>
-                <div v-if="filteredOrders().length" class="space-y-6">
-                    <div v-for="order in filteredOrders()" :key="order.id"
-                    :class="theme === 'light' ? 'bg-gray-50 border-gray-300' : 'bg-gray-800 border-gray-700'"
-                    class="border rounded-lg p-6 shadow-md flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-
+                <div v-if="paginatedOrders.length" class="space-y-6">
+                    <div v-for="order in paginatedOrders" :key="order.id"
+                        class="border rounded-lg p-6 shadow-md flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                         <div class="flex flex-col md:flex-row md:items-center md:gap-6 w-full">
-                            <p :class="theme === 'light' ? 'text-black' : 'text-white'" class="text-lg font-semibold">
-                                Order ID: #{{ order.id }}
-                            </p>
-                            <p :class="theme === 'light' ? 'text-black' : 'text-gray-300'">
-                                Total Price: ${{ order.total_price }}
-                            </p>
-                            <p :class="theme === 'light' ? 'text-yellow-600' : 'text-gray-300'">
-                                Status: <span class="font-medium">{{ order.status }}</span>
-                            </p>
-                            <p :class="theme === 'light' ? 'text-black' : 'text-gray-300'">
-                                Created At: {{ formatDate(order.created_at) }}
-                            </p>
+                            <p class="text-xs md:text-sm font-semibold">Order ID: #{{ order.id }}</p>
+                            <p>Total Price: Ksh.{{ order.total_price }}</p>
+                            <p>Status: <span class="font-medium">{{ order.status }}</span></p>
+                            <p>Created At: {{ formatDate(order.created_at) }}</p>
                         </div>
-
                         <div class="mt-2 w-full">
-                            <p :class="theme === 'light' ? 'text-black' : 'text-white'"
-                                class="text-lg font-bold">Items:</p>
-                            <ul class="list-disc pl-5 font-bold text-lg"
-                                :class="theme === 'light' ? 'text-black' : 'text-white'">
+                            <p class="text-lg font-bold">Items:</p>
+                            <ul class="list-disc pl-5 font-bold text-lg">
                                 <li v-for="item in order.items" :key="item.product_id">
                                     {{ item.product_name }} [{{ item.quantity }}]
                                 </li>
                             </ul>
                         </div>
-
                         <div class="mt-4 flex flex-wrap gap-2 justify-center md:justify-end w-full">
                             <template v-if="order.status === 'pending'">
                                 <button @click="cancelOrder(order.id)"
-                                    class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md">
+                                    class="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded-md">
                                     Cancel
                                 </button>
                             </template>
                         </div>
                     </div>
                 </div>
-
-                <p v-else class="text-gray-500 text-center">No orders found.</p>
             </div>
         </div>
     </section>
 </template>
-<!-- <p v-else class="text-gray-500 text-center">No orders found.</p> -->

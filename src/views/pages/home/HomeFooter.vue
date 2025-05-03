@@ -51,8 +51,8 @@
         <div class="flex flex-wrap items-center md:justify-between justify-center">
           <div class="w-full md:w-4/12 px-4 mx-auto text-center">
             <div class="text-sm text-blueGray-500 font-semibold py-1">
-              Copyright © <span id="get-current-year">{{ currentYear }}</span><a href="https://www.creative-tim.com/product/notus-js" class="text-blueGray-500 hover:text-gray-800" target="_blank"> Kujimwalo by</a>
-              <a href="https://www.creative-tim.com?ref=njs-profile" class="text-blueGray-500 hover:text-blueGray-800">Mikey-gotcode</a>.
+              Copyright © <span id="get-current-year">{{ currentYear }}</span><a href="https://kujimwalo.netlify.app/" class="text-blueGray-500 hover:text-gray-800" target="_blank"> Kujimwalo by</a>
+              <a href="https://mikeygotcodeportfolio.netlify.app/" class="text-blueGray-500 hover:text-blueGray-800">Mikey-gotcode</a>.
             </div>
           </div>
         </div>
@@ -61,6 +61,7 @@
   </template>
 
 <script setup>
+
 import '@fortawesome/fontawesome-free/css/all.min.css'
 
 const currentYear = new Date().getFullYear();

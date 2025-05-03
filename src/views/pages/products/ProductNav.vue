@@ -15,14 +15,15 @@ onMounted(() => {
 <template>
   <nav class="antialiased"
       :class="{ 'bg-white text-gray-900': theme === 'light', 'bg-gray-700 text-gray-200': theme === 'dark' }">
-    <div class="max-w-screen-xl px-4 mx-auto py-4">
+    <div class="max-w-screen-xl px-2  py-4">
       <div class="flex items-center justify-between">
         <!-- Brand -->
         <div class="flex items-center w-full lg:w-auto justify-between">
           <router-link v-if="navigation?.brand?.link" :to="navigation.brand.link" class="flex items-center text-lg">
             <img class="block w-auto h-8 dark:hidden" :src="navigation?.brand.logo.light" alt="Logo">
             <img class="hidden w-auto h-8 dark:block" :src="navigation?.brand.logo.dark" alt="Logo">
-            <span class="ml-2 text-gray-900 dark:text-white font-semibold">{{ navigation?.brand.name }}</span>
+            <span :class="{ 'text-black': theme === 'light', 'text-gray-200': theme === 'dark' }"
+                  class="ml-2 font-semibold">{{ navigation?.brand.name }}</span>
           </router-link>
           
           <!-- Mobile Menu Button -->
@@ -34,9 +35,9 @@ onMounted(() => {
         </div>
 
         <!-- Desktop Navigation -->
-        <ul class="hidden lg:flex items-center gap-6 py-3">
+        <ul class="hidden lg:flex items-center gap-6 py-3 md:pr-4">
           <li v-for="item in navigation?.menuItems" :key="item.name">
-            <router-link :to="item.link" class="text-sm font-medium text-gray-900 hover:text-primary-700 dark:text-white dark:hover:text-primary-500">
+            <router-link :to="item.link" class="text-sm font-medium  hover:text-primary-700 dark:hover:text-primary-500" :class="theme">
               {{ item.name }}
             </router-link>
           </li>

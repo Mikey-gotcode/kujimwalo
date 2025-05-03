@@ -18,21 +18,22 @@
       </div>
     <div v-else-if="error" class="text-center text-red-600">{{ error }}</div>
     <div v-else-if="products.length === 0" class="text-center text-gray-600">No products found.</div>
-    <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       <div
-        v-for="product in products"
+        v-for="product in paginatedProducts"
         :key="product.id"
-        class="bg-white rounded-lg shadow-md overflow-hidden transition hover:shadow-lg p-3 md:p-4"
+        class=" rounded-lg shadow-md overflow-hidden transition hover:shadow-lg p-3 md:p-4"
+        :class="theme === 'light' ? 'bg-gray-100 border-gray-300' : 'bg-gray-800 border-gray-700'"
       >
         <div class="relative">
           <img :src="product.image" :alt="product.name" class="w-full aspect-[4/3] object-cover rounded-lg" />
         </div>
         <div class="p-3 md:p-4">
-          <h3 class="text-base md:text-lg font-semibold text-gray-800">{{ product.name }}</h3>
-          <p class="text-gray-600 text-xs md:text-sm">Category ID: {{ product.category_id }}</p>
-          <p class="text-gray-600 text-xs md:text-sm">Last Restocked: {{ product.last_restocked }}</p>
+          <h3 :class="theme === 'light' ? 'text-black' : 'text-white'" class="text-base md:text-lg font-semibold">{{ product.name }}</h3>
+          <p :class="theme === 'light' ? 'text-black' : 'text-white'"  class="text-xs md:text-sm">Category ID: {{ product.category_id }}</p>
+          <p :class="theme === 'light' ? 'text-black' : 'text-white'"class="text-xs md:text-sm">Last Restocked: {{ product.last_restocked }}</p>
           <div class="flex justify-between items-center mt-2">
-            <span class="text-lg md:text-xl font-bold text-blue-600">${{ product.price }}</span>
+            <span class="text-lg md:text-xl font-bold text-blue-600">Ksh.{{ product.price }}</span>
             <span :class="isInStock(product) ? 'text-green-500' : 'text-red-500'">
               {{ isInStock(product) ? "In Stock" : "Out of Stock" }}
             </span>
@@ -46,7 +47,8 @@
               >
                 -
               </button>
-              <span class="text-lg font-semibold">{{ quantities[product.id] }}</span>
+              <span :class="theme ==='light'?'text-black':'text-gray-300'"
+                    class="text-lg font-semibold">{{ quantities[product.id] }}</span>
               <button
                 @click="increaseQuantity(product)"
                 class="bg-blue-500 px-3 py-2 sm:px-4 sm:py-2 rounded-md text-base font-bold hover:bg-gray-600 text-white transition"
@@ -61,6 +63,23 @@
         </div>
       </div>
     </div>
+    <div v-if="totalPages > 1" class="flex justify-center mt-6 gap-4">
+      <button
+        @click="prevPage"
+        :disabled="currentPage === 1"
+        class="px-4 py-2 border rounded-md bg-blue-200 hover:bg-gray-300 disabled:opacity-50 hover:scale-105 transition-transform"
+      >
+        Prev
+      </button>
+      <span>Page {{ currentPage }} of {{ totalPages }}</span>
+      <button
+        @click="nextPage"
+        :disabled="currentPage === totalPages"
+        class="px-4 py-2 border rounded-md bg-blue-200 hover:bg-gray-300 disabled:opacity-50 hover:scale-105 transition-transform"
+      >
+        Next
+      </button>
+    </div>
 
     <!-- View Cart Button (Fixed at Bottom) -->
     <button 
@@ -73,7 +92,8 @@
 
     <!-- Teleported Cart -->
     <Teleport to="body">
-      <div v-if="showCart" class="fixed top-5 right-5 w-11/12 sm:w-96 bg-white rounded-lg shadow-lg p-4 border border-gray-200">
+      <div v-if="showCart" class="fixed top-5 right-5 w-11/12 sm:w-96 rounded-lg shadow-lg p-4 border border-gray-200"
+      :class="{'bg-white text-gray-900 border-gray-200': theme === 'light', 'bg-gray-800 text-gray-200 border-gray-900': theme === 'dark'}">
         <div class="flex justify-between items-center">
           <h2 class="text-lg sm:text-xl font-bold">Cart</h2>
           <button @click="showCart = false" class="text-blue-500 hover:underline">Close</button>
@@ -95,7 +115,7 @@
 
 
 <script setup>
-import { ref, onBeforeMount, watchEffect, defineProps, nextTick } from "vue";
+import { ref, onBeforeMount, watch, defineProps, nextTick, inject, computed } from "vue";
 import axios from "axios";
 import api from "../../../../api";
 import { useAuthStore } from "../../../../store/auth";
@@ -108,6 +128,7 @@ const props = defineProps({
 });
 
 const products = ref([]);
+const allProducts = ref([])
 const loading = ref(true);
 const error = ref(null);
 const cart = ref([]);
@@ -116,6 +137,9 @@ const showCart = ref(false); // Controls cart visibility
 const authStore = useAuthStore()
 const cartStore = useCartStore()
 const router = useRouter()
+const theme = inject("theme")
+const currentPage = ref(1);
+const itemsPerPage = 6;
 
 
 const isInStock = (product) => product.stock_quantity > 0;
@@ -164,12 +188,14 @@ const checkout = async () => {
     }
 
     const orderPayload = {
-      customer_id: authStore.user.id, 
+      user_id: authStore.user.id, 
       items: cart.value.map(item => ({
         product_id: item.id,  
         quantity: item.quantity
       }))
     };
+
+    console.log("cart:",orderPayload)
 
     const orderResponse = await axios.post(
       `${api.baseURL}/orders`,
@@ -184,9 +210,9 @@ const checkout = async () => {
       }
     );
 
-    alert("Order placed successfully!");
+    alert("Order placed successfully!",orderResponse);
     cart.value = [];
-    console.log("Order response:", orderResponse.data);
+    //console.log("Order response:", orderResponse.data);
   } catch (error) {
     console.error("Error processing order:", error.response?.data || error.message);
   }
@@ -212,6 +238,10 @@ const loadProducts = async () => {
       withCredentials: true, // Important if using Laravel Sanctum
     });
     
+    // Ensure products are always an array
+    allProducts.value = Array.isArray(response.data) ? response.data : [];
+
+
     // Filter products
     products.value = props.activeTab ? response.data.filter((p) => p.category_id === props.activeTab) : response.data;
     products.value.forEach(product => {
@@ -219,6 +249,7 @@ const loadProducts = async () => {
         quantities.value[product.id] = 0;
       }
     });
+    updatePaginatedProducts();
   } catch (error) {
     error.value = "Failed to fetch products. Please try again later.";
     console.error("Error fetching products:", err);
@@ -227,11 +258,46 @@ const loadProducts = async () => {
   }
 };
 
+
+// Refresh paginated products when currentPage changes
+const updatePaginatedProducts = () => {
+  if (currentPage.value > totalPages.value) {
+    currentPage.value = totalPages.value || 1;
+  }
+};
+
+
+const totalPages = computed(() => Math.ceil(products.value.length / itemsPerPage));
+
+const paginatedProducts = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  return products.value.slice(start, start + itemsPerPage);
+});
+
+const nextPage = () => {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++;
+  }
+};
+
+const prevPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value--;
+  }
+};
+
 onBeforeMount(() => {
   loadProducts();
 });
 
-watchEffect(() => {
-  loadProducts();
+// Watch for changes in activeTab to re-filter products
+watch(() => props.activeTab, () => {
+  // Filter products again when activeTab changes
+  products.value = props.activeTab 
+    ? allProducts.value.filter((p) => p.category_id === props.activeTab) 
+    : allProducts.value;
+  
+  updatePaginatedProducts();
 });
+
 </script>

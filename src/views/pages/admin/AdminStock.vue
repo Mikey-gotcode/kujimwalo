@@ -1,79 +1,64 @@
+
 <template>
-  <ProductNav />
-  <div class="page-content py-8" :class="{ 'bg-gray-100 text-black': theme === 'light', 'bg-gray-900 text-white': theme === 'dark' }">
-    <div class="container mx-auto px-4">
-      <div class="flex flex-col lg:flex-row gap-6">
-        <!-- Sidebar -->
-        <div class="lg:w-1/4 w-full">
-          <CategoriesSide />
-        </div>
+  <AdminLayout>
 
-        <!-- Main Content -->
-        <div class="flex-1 p-4">
-          <div class="shadow-md rounded-lg p-6"
-            :class="{ 'bg-white text-gray-900': theme === 'light', 'bg-gray-700 text-gray-200': theme === 'dark' }">
-        
-
-            <!-- Buttons -->
-            <div class="flex flex-wrap justify-end gap-4 mb-4">
-              <button @click="showProductModal = true"
-                class="px-4 py-2 rounded w-full sm:w-auto"
-                :class="{ 'bg-blue-500 text-white': theme === 'light', 'bg-blue-400 text-black': theme === 'dark' }">
-                + Add Product
-              </button>
-              <button @click="showCategoryModal = true"
-                class="px-4 py-2 rounded w-full sm:w-auto"
-                :class="{ 'bg-blue-500 text-white': theme === 'light', 'bg-blue-400 text-black': theme === 'dark' }">
-                + Add Category
-              </button>
-            </div>
-
-            <AddProduct v-if="showProductModal" :isOpen="showProductModal" title="Add Product" @close="showProductModal = false" />
-            <AddCategory v-if="showCategoryModal" :isOpen="showCategoryModal" title="Add Category" @close="showCategoryModal = false" />
-
-            <div class="border-b pb-4 mb-4"
-              :class="{ 'border-gray-300': theme === 'light', 'border-gray-600': theme === 'dark' }">
-              <h3 class="text-xl font-semibold">Products</h3>
-            </div>
-
-            <!-- Tab Navigation -->
-            <div v-if="loading" class="flex justify-center items-center">
-        <div aria-label="Loading..." role="status" class="flex items-center space-x-2">
-          <svg class="h-20 w-20 animate-spin stroke-gray-500" viewBox="0 0 256 256">
-              <line x1="128" y1="32" x2="128" y2="64" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
-              <line x1="195.9" y1="60.1" x2="173.3" y2="82.7" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
-              <line x1="224" y1="128" x2="192" y2="128" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
-              <line x1="195.9" y1="195.9" x2="173.3" y2="173.3" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
-              <line x1="128" y1="224" x2="128" y2="192" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
-              <line x1="60.1" y1="195.9" x2="82.7" y2="173.3" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
-              <line x1="32" y1="128" x2="64" y2="128" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
-              <line x1="60.1" y1="60.1" x2="82.7" y2="82.7" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
-          </svg>
-          <span class="text-4xl font-medium text-gray-500">Loading...</span>
-        </div>
+     <!-- Buttons -->
+     <div class="flex flex-wrap justify-end gap-4 mb-4">
+        <button @click="showProductModal = true"
+          class="px-4 py-2 rounded w-full sm:w-auto"
+          :class="{ 'bg-blue-500 text-white': theme === 'light', 'bg-blue-400 text-black': theme === 'dark' }">
+          + Add Product
+        </button>
+        <button @click="showCategoryModal = true"
+          class="px-4 py-2 rounded w-full sm:w-auto"
+          :class="{ 'bg-blue-500 text-white': theme === 'light', 'bg-blue-400 text-black': theme === 'dark' }">
+          + Add Category
+        </button>
       </div>
-    <div v-else-if="error" class="text-center text-red-600">{{ error }}</div>
-            <div v-else>
-              <ul class="flex flex-wrap border-b"
-                :class="{ 'border-gray-300': theme === 'light', 'border-gray-600': theme === 'dark' }">
-                <li v-for="tab in tabs" :key="tab.id"
-                  @click="selectTab(tab.id)"
-                  class="mr-2 sm:mr-4 cursor-pointer py-2 px-2 sm:px-4 font-semibold transition-colors duration-300 text-sm sm:text-base"
-                  :class="selectedTab === tab.id ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400'">
-                  {{ tab.label }} ({{ tab.count }})
-                </li>
-              </ul>
-            </div>
 
-            <!-- Tab Content -->
-            <div class="mt-4" v-for="tab in tabs" :key="tab.label">
-              <OtherProducts v-if="selectedTab === tab.id" :activeTab="currentTab" ref="hDrinkNumb" />
-            </div>
-          </div>
-        </div>
+      <AddProduct v-if="showProductModal" :isOpen="showProductModal" title="Add Product" @close="showProductModal = false" />
+      <AddCategory v-if="showCategoryModal" :isOpen="showCategoryModal" title="Add Category" @close="showCategoryModal = false" />
+
+      <div class="border-b pb-4 mb-4"
+        :class="{ 'border-gray-300': theme === 'light', 'border-gray-600': theme === 'dark' }">
+        <h3 class="text-xl font-semibold">Products</h3>
       </div>
-    </div>
+
+      <!-- Tab Navigation -->
+      <div v-if="loading" class="flex justify-center items-center">
+  <div aria-label="Loading..." role="status" class="flex items-center space-x-2">
+    <svg class="h-20 w-20 animate-spin stroke-gray-500" viewBox="0 0 256 256">
+        <line x1="128" y1="32" x2="128" y2="64" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
+        <line x1="195.9" y1="60.1" x2="173.3" y2="82.7" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
+        <line x1="224" y1="128" x2="192" y2="128" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
+        <line x1="195.9" y1="195.9" x2="173.3" y2="173.3" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
+        <line x1="128" y1="224" x2="128" y2="192" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
+        <line x1="60.1" y1="195.9" x2="82.7" y2="173.3" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
+        <line x1="32" y1="128" x2="64" y2="128" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
+        <line x1="60.1" y1="60.1" x2="82.7" y2="82.7" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></line>
+    </svg>
+    <span class="text-4xl font-medium text-gray-500">Loading...</span>
   </div>
+</div>
+<div v-else-if="error" class="text-center text-red-600">{{ error }}</div>
+      <div v-else>
+        <ul class="flex flex-wrap border-b"
+          :class="{ 'border-gray-300': theme === 'light', 'border-gray-600': theme === 'dark' }">
+          <li v-for="tab in tabs" :key="tab.id"
+            @click="selectTab(tab.id)"
+            class="mr-2 sm:mr-4 cursor-pointer py-2 px-2 sm:px-4 font-semibold transition-colors duration-300 text-sm sm:text-base"
+            :class="selectedTab === tab.id ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400'">
+            {{ tab.label }} ({{ tab.count }})
+          </li>
+        </ul>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="mt-4" v-for="tab in tabs" :key="tab.label">
+        <OtherProducts v-if="selectedTab === tab.id" :activeTab="currentTab" ref="hDrinkNumb" />
+      </div>
+
+  </AdminLayout>
 </template>
 
 
@@ -81,8 +66,7 @@
 import { ref, onMounted, watch, computed, nextTick, inject } from 'vue';
 import axios from 'axios';
 import api from '../../../api';
-import ProductNav from '../products/ProductNav.vue';
-import CategoriesSide from '../../layouts/CategoriesSide.vue';
+import AdminLayout from './AdminLayout.vue';
 import OtherProducts from '../admin/categories/OtherProducts.vue';
 import AddProduct from '../admin/categories/AddProducts.vue'; 
 import AddCategory from '../admin/categories/AddCategory.vue'; 

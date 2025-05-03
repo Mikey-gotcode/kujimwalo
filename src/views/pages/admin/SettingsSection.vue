@@ -2,29 +2,29 @@
     <div :class="theme" class="min-h-screen flex items-center justify-center p-6 transition">
         <div class="w-full max-w-xl space-y-8">
             <!-- Change Password Section -->
-            <div class="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow-lg transition">
-                <h2 class="text-lg font-semibold text-black dark:text-white">Change password</h2>
-                <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+            <div class="p-6 rounded-lg shadow-lg transition" :class="theme" >
+                <h2 class="text-lg font-semibold" :class="theme">Change password</h2>
+                <p class="text-sm mb-4" :class="theme">
                     Update your password associated with your account.
                 </p>
 
                 <form @submit.prevent="changePassword" class="space-y-4">
                     <div>
-                        <label class="block text-gray-700 dark:text-gray-300 text-sm">Current password</label>
+                        <label class="block text-sm" :class="theme">Current password</label>
                         <input v-model="currentPassword" type="password"
-                            class="w-full bg-gray-200 dark:bg-gray-700 text-black dark:text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" :class="theme" />
                     </div>
 
                     <div>
-                        <label class="block text-gray-700 dark:text-gray-300 text-sm">New password</label>
+                        <label class="block text-sm" :class="theme">New password</label>
                         <input v-model="newPassword" type="password"
-                            class="w-full bg-gray-200 dark:bg-gray-700 text-black dark:text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                            class="w-full border px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" :class="theme" />
                     </div>
 
                     <div>
-                        <label class="block text-gray-700 dark:text-gray-300 text-sm">Confirm password</label>
+                        <label class="block text-sm" :class="theme">Confirm password</label>
                         <input v-model="confirmPassword" type="password"
-                            class="w-full bg-gray-200 dark:bg-gray-700 text-black dark:text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                            class="w-full border px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" :class="theme" />
                     </div>
 
                     <button type="submit"
@@ -35,17 +35,17 @@
             </div>
 
             <!-- Log Out Other Sessions -->
-            <div class="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow-lg transition">
-                <h2 class="text-lg font-semibold text-black dark:text-white">Log out other sessions</h2>
-                <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+            <div class="p-6 rounded-lg shadow-lg transition" :class="theme" >
+                <h2 class="text-lg font-semibold" :class="theme">Log out other sessions</h2>
+                <p class="text-sm mb-4" :class="theme">
                     Enter your password to log out from all other sessions.
                 </p>
 
                 <form @submit.prevent="logoutSessions">
                     <div class="mb-4">
-                        <label class="block text-gray-700 dark:text-gray-300 text-sm">Your password</label>
+                        <label class="block text-sm" :class="theme">Your password</label>
                         <input v-model="logoutPassword" type="password"
-                            class="w-full bg-gray-200 dark:bg-gray-700 text-black dark:text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                            class="w-full border px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" :class="theme" />
                     </div>
 
                     <button type="submit"
@@ -56,17 +56,17 @@
             </div>
 
             <!-- Delete Account -->
-            <div class="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow-lg transition">
+            <div class="p-6 rounded-lg shadow-lg transition" :class="theme" >
                 <h2 class="text-lg font-semibold text-red-600 dark:text-red-400">Delete Account</h2>
-                <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                <p class="text-sm mb-4" :class="theme">
                     This action is irreversible. Enter your password to confirm.
                 </p>
 
                 <form @submit.prevent="confirmDelete">
                     <div class="mb-4">
-                        <label class="block text-gray-700 dark:text-gray-300 text-sm">Your password</label>
+                        <label class="block text-sm" :class="theme">Your password</label>
                         <input v-model="deletePassword" type="password"
-                            class="w-full bg-gray-200 dark:bg-gray-700 text-black dark:text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500" />
+                            class="w-full border px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"  :class="theme"/>
                     </div>
 
                     <button type="button" @click="confirmDelete"
@@ -78,9 +78,9 @@
 
             <!-- Delete Confirmation Modal -->
             <div v-if="showDeleteModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-                    <h3 class="text-lg font-semibold text-black dark:text-white">Are you sure?</h3>
-                    <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                <div class="p-6 rounded-lg shadow-lg" :class="theme">
+                    <h3 class="text-lg font-semibold" :class="theme">Are you sure?</h3>
+                    <p class="text-sm mb-4" :class="theme">
                         This action cannot be undone. Your account will be permanently deleted.
                     </p>
 

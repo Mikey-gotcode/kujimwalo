@@ -64,26 +64,7 @@
               <OtherProducts v-if="selectedTab === tab.id" :activeTab="currentTab"  ref="hDrinkNumb"/>
             </div>
           </div>
-          
-          <!-- Teleported Cart -->
-          <Teleport to="body">
-            <div v-if="showCart" class="fixed top-5 right-5 w-11/12 md:w-96 bg-white rounded-lg shadow-lg p-4 border border-gray-200">
-              <div class="flex justify-between items-center">
-                <h2 class="text-lg md:text-xl font-bold">Cart</h2>
-                <button @click="showCart = false" class="text-blue-500 hover:underline">Close</button>
-              </div>
-              <ul>
-                <li v-for="item in cart" :key="item.id" class="flex justify-between items-center mt-3">
-                  <span class="text-sm md:text-base">{{ item.name }} ({{ item.quantity }})</span>
-                  <button @click="removeFromCart(item.id)" class="text-blue-500 hover:underline text-sm md:text-base">Remove</button>
-                </li>
-              </ul>
-              <button @click="checkout" class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 md:py-3 rounded-lg shadow-md transition">
-                Proceed to Checkout
-              </button>
-            </div>
-          </Teleport>
-          
+
           <!-- Pagination -->
           <div class="mt-6 flex flex-col sm:flex-row justify-between items-center">
             <p class="text-gray-700">Page 1 of 2</p>

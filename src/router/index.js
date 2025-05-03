@@ -23,6 +23,8 @@ import AdminIndex from '../views/pages/admin/AdminIndex.vue'
 import AdminDashboard from '../views/pages/admin/AdminDashboard.vue'
 import AdminStock from '../views/pages/admin/AdminStock.vue' 
 import ManageOrders from '../views/pages/admin/ManageOrders.vue' 
+import ManageExpenses from '../views/pages/admin/ManageExpenses.vue'
+import ManageUsers from '../views/pages/admin/ManageUsers.vue' 
 import AdminSettings from '../views/pages/admin/AdminSettings.vue' 
 import QRComponent from '../views/pages/admin/QRComponent.vue' 
 
@@ -53,6 +55,8 @@ const routes =[
             {path:'profile',component:AdminDashboard},
             {path:'stock',component:AdminStock },
             {path:'orders',component:ManageOrders},
+            {path:'expenses',component:ManageExpenses},
+            {path:'usermanagement',component:ManageUsers},
             {path:'settings',component:AdminSettings},
             {path:'qrcode',component:QRComponent}
         ]

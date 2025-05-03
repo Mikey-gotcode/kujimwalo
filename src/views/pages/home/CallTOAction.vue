@@ -3,7 +3,7 @@
     <!-- Background Image -->
     <div
       class="absolute inset-0 bg-cover bg-center"
-      :style="{ backgroundImage: `url(background.jpeg)` }"
+      :style="{ backgroundImage: `url(barcounter.jpeg)` }"
     ></div>
 
     <!-- Overlay -->

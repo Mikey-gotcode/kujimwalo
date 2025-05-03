@@ -57,12 +57,12 @@
                 </button>
             </form>
 
-            <!-- Alert Message -->
-            <div v-if="alertMessage" class="fixed top-5 right-5 bg-blue-500 text-white px-4 py-2 rounded shadow">
-                {{ alertMessage }}
-            </div>
         </div>
     </teleport>
+    <!-- Alert Message -->
+    <div v-if="alertMessage" class="fixed top-5 right-5 bg-blue-500 text-white px-4 py-2 rounded shadow">
+        {{ fullMessage }}
+    </div>
 </template>
 
 <script setup>
@@ -106,8 +106,8 @@ const clearInput = () => {
 };
 
 const submitForm = async () => {
-    if (!amount.value || isNaN(amount.value)) {
-        showAlert("Please enter a valid amount");
+    if (!amount.value || isNaN(amount.value) || amount.value <= 0) {
+        showAlert({ message: "Please enter a valid amount" });
         return;
     }
 
@@ -119,11 +119,12 @@ const submitForm = async () => {
             router.push('/signin');
             return;
         }
-        const response = await axios.post(`${api.baseURL}/orders/${props.orderID}/process-payment`,
+
+        const response = await axios.post(`${api.baseURL}/orders/${props.orderID}/process-payment`, 
         {
             amount: amount.value,
             payment_method: props.paymentMethod
-        },
+        }, 
         {
             headers: {
                 Authorization: `Bearer ${authToken}`,
@@ -132,24 +133,50 @@ const submitForm = async () => {
             withCredentials: true,
         });
 
-        if (response.data.success) {
-            showAlert(response.data.message || "Payment successful");
+        if (response?.data) {
+            showAlert(response.data); // Ensure response.data is passed correctly
             emit('paymentSuccess');
             setTimeout(() => closeModal(), 2000);
         } else {
-            showAlert(`Payment failed: ${response.data.message}`);
+            showAlert({ message: "Payment failed: Unexpected response format." });
         }
     } catch (error) {
-        showAlert(error.response?.data?.error || "Payment failed");
+        showAlert({ message: error.response?.data?.error || "Payment failed due to a network error." });
     }
 };
 
-const showAlert = (message) => {
-    alertMessage.value = message;
+
+
+const showAlert = (responseData) => {
+    if (!responseData || typeof responseData !== "object") {
+        console.error("Invalid response data:", responseData);
+        alertMessage.value = "An unexpected error occurred.";
+        alert("An unexpected error occurred."); // Fallback alert
+        return;
+    }
+
+    // Extract message and remaining balance correctly
+    const message = responseData.message || "Something went wrong.";
+    const remainingBalance = responseData.remaining_balance !== undefined ? responseData.remaining_balance : null;
+
+    // Format the alert message
+    const fullMessage = remainingBalance > 0 
+        ? `${message} Remaining balance: KES ${remainingBalance}`
+        : message;
+
+    alertMessage.value = fullMessage;
+
+    // Browser fallback alert
+    alert(fullMessage);
+
+    console.log("Alert message set:", fullMessage); // Debugging log
+
     setTimeout(() => {
+        console.log("Clearing alert"); // Debugging log
         alertMessage.value = "";
     }, 5000);
 };
+
 
 const closeModal = () => {
     emit('close');

@@ -1,5 +1,9 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, inject } from 'vue'
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+const theme = inject("theme")
 
 const isMenuOpen = ref(false)
 const menuItems = ref({
@@ -24,6 +28,24 @@ const menuItems = ref({
       link: "/admin/orders"
     },
     {
+      label: "Manage Expenses",
+      icon: "../../assets/icons/cash-currency-dollar-finance-money-payment-svgrepo-com.svg",
+      link: "/admin/expenses",
+      badge: {
+        text: "3",
+        class: "bg-blue-500 text-white"
+      }
+    },
+    {
+      label: "Manage users",
+      icon: "../../assets/icons/users-young-svgrepo-com.svg",
+      link: "/admin/usermanagement",
+      badge: {
+        text: "3",
+        class: "bg-blue-500 text-white"
+      }
+    },
+    {
       label: "Settings",
       icon: "../../assets/icons/settings-tools-and-utensils-svgrepo-com.svg",
       link: "/admin/settings"
@@ -38,13 +60,14 @@ const menuItems = ref({
 </script>
 
 <template>
-  <aside class="w-64 bg-gray-900 text-white min-h-auto shadow-lg px-4 lg:block" :class="{ 'hidden': !isMenuOpen, 'block': isMenuOpen ,}">
-    <nav>
+  <aside class="w-64 min-h-auto grow shadow-lg px-4 lg:block" :class="{ 'hidden': !isMenuOpen, 'block': isMenuOpen ,}">
+    <nav :class="{'bg-white text-gray-900': theme === 'light', 'bg-gray-700 text-gray-200': theme === 'dark'}">
       <ul>
         <li v-for="item in menuItems.items" :key="item.label" class="py-3">
           <router-link
             :to="item.link"
             class="flex items-center gap-3 p-3 text-lg font-medium transition duration-200 ease-in-out hover:bg-gray-700 rounded-md"
+            :class="{ 'bg-gray-200 text-gray-900 dark:bg-gray-700 dark:text-white': router.path === item.link, 'hover:bg-gray-700': router.path !== item.link }"
           >
             <img :src="item.icon" class="w-6 h-6" alt="icon" />
             <span>{{ item.label }}</span>

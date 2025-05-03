@@ -49,12 +49,12 @@ export default {
     });
 
     const services = [
-      { title: "Web Development", description: "Building modern and responsive websites." },
+      { title: "Customers Served", description: "Building modern and responsive websites." },
       { title: "App Development", description: "Creating mobile apps for Android and iOS." },
       { title: "SEO Optimization", description: "Enhancing your website's visibility online." },
       { title: "Cloud Solutions", description: "Providing scalable cloud infrastructure." },
-      { title: "Cybersecurity", description: "Ensuring digital security and data protection." },
-      { title: "E-Commerce", description: "Building online stores for your business." }
+      // { title: "Cybersecurity", description: "Ensuring digital security and data protection." },
+      // { title: "E-Commerce", description: "Building online stores for your business." }
     ];
 
     return { services };

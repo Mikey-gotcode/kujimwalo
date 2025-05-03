@@ -1,7 +1,8 @@
 <template>
    <teleport to="body">
       <div v-if="isOpen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-         <form @submit.prevent="submitForm" class="bg-white p-6 rounded-lg shadow-lg w-96">
+         <form @submit.prevent="submitForm" class="p-6 rounded-lg shadow-lg w-96"
+         :class="{'bg-white text-gray-900': theme === 'light', 'bg-gray-800 text-gray-200': theme === 'dark'}">
             <h2 class="text-lg font-semibold mb-4">{{ title }}</h2>
 
             <!-- Success/Error Message with Styling -->
@@ -41,7 +42,7 @@
                Add new product
             </button>
             <button type="button" @click="closeModal"
-               class="text-gray-700 bg-gray-200 hover:bg-gray-300 focus:ring-4 focus:outline-none focus:ring-gray-400 font-medium rounded-lg text-sm px-5 py-2.5">
+            class="w-full text-gray-700 bg-red-400 hover:bg-red-500 focus:ring-4 focus:outline-none focus:ring-gray-400 font-medium rounded-lg text-sm px-5 py-2.5">
                Close
             </button>
          </form>
@@ -50,7 +51,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, defineProps, defineEmits, onMounted } from 'vue';
+import { ref, reactive, defineProps, defineEmits, onMounted, inject } from 'vue';
 import axios from 'axios';
 import api from '../../../../api';
 import { useAuthStore } from '../../../../store/auth';
@@ -61,6 +62,8 @@ const emit = defineEmits();
 
 const authStore = useAuthStore()
 const router = useRouter()
+
+const theme = inject("theme")
 
 const categories = ref([]);
 const errorMessage = ref('');

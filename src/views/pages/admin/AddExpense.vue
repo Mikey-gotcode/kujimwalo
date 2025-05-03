@@ -17,6 +17,10 @@
                    <label for="name" class="block mb-2 text-sm font-medium">Name</label>
                    <input v-model="formData.name" type="text" id="name" class="input-field" required />
                 </div>
+                <div>
+                   <label for="name" class="block mb-2 text-sm font-medium">price</label>
+                   <input v-model="formData.price" type="number" id="price" class="input-field" required />
+                </div>
                
                 <p v-if="errorMessage" class="text-red-500 mt-2">{{ errorMessage }}</p>
              </div>
@@ -36,24 +40,32 @@
  <script setup>
  import { ref, reactive, defineProps, defineEmits, inject } from 'vue';
  import axios from 'axios';
- import api from '../../../../api';
-import { useAuthStore } from '../../../../store/auth';
+ import api from '../../../api';
+import { useAuthStore } from '../../../store/auth';
 import {useRouter} from 'vue-router'
  
  defineProps(['isOpen', 'title']);
- const emit = defineEmits();
+ const emit = defineEmits([
++  'close'
+]);
+
 
  const authStore = useAuthStore()
 const router = useRouter()
 
 const theme = inject("theme")
 
+const expenses = ref([]);
+
  
  
  const errorMessage = ref('');
+ const loading = ref(true);
+ const error = ref(null);
  
  const formData = reactive({
     name: '',
+    price:''
     
  });
  
@@ -70,7 +82,7 @@ const theme = inject("theme")
             return;
          }
        //console.log("form data:", formData);
-       const response = await axios.post(`${api.baseURL}/category`,formData,{
+       const response = await axios.post(`${api.baseURL}/expenses`,formData,{
          headers: {
          Authorization: `Bearer ${authToken}`, // Ensure the correct format
          Accept: 'application/json', // Sometimes required for Laravel-based APIs
@@ -85,17 +97,40 @@ const theme = inject("theme")
        // Clear form after submission
        Object.keys(formData).forEach(key => formData[key] = '');
        
+       //close modal
+       emit('close')
+       fetchExpenses()
+
        // Hide message after 3 seconds
        setTimeout(() => message.value = '', 3000);
     } catch (error) {
        // Display error message with red effect
-       message.value = 'Failed to add product. Try again!';
+       errorMessage.value = 'Failed to add product. Try again!';
        messageType.value = 'bg-red-500 text-white p-3 border border-red-700';
  
        // Hide error message after 3 seconds
        setTimeout(() => message.value = '', 3000);
     }
  };
+
+ const fetchExpenses = async () => {
+  try {
+    const authToken = authStore.token;
+    if (!authToken) {
+      alert("You need to log in first.");
+      router.push('/signin');
+      return;
+    }
+    const response = await axios.get(`${api.baseURL}/expenses`, {
+      headers: { Authorization: `Bearer ${authToken}`, Accept: 'application/json' },
+    });
+    expenses.value = response.data;
+  } catch (err) {
+    error.value = 'Failed to fetch expenses';
+  } finally {
+    loading.value = false;
+  }
+};
  
  
  

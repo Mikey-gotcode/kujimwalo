@@ -137,7 +137,7 @@ const clear = () => {
 
 const submitForm = async () => {
     if (!amount.value || isNaN(parseInt(amount.value))) {
-        alert("Please enter a valid amount");
+        showAlert("Please enter a valid amount");
         return;
     }
 
@@ -165,15 +165,22 @@ const submitForm = async () => {
         });
 
         if (response.data.success) {
-            alert(response.data.message || "Payment successful");
+            showAlert(response.data.message || "Payment successful");
             emit('paymentSuccess');
             setTimeout(() => closeModal(), 2000);
         } else {
-            alert(`Payment failed: ${response.data.message}`);
+            showAlert(`Payment failed: ${response.data.message}`);
         }
     } catch (error) {
-        alert(error.response?.data || "Payment failed");
+        showAlert(error.response?.data || "Payment failed");
     }
+};
+
+const showAlert = (message) => {
+    alertMessage.value = message;
+    setTimeout(() => {
+        alertMessage.value = "";
+    }, 5000);
 };
 
 const closeModal = () => {
