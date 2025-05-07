@@ -2,12 +2,12 @@
     <div v-if="isLoading" class="flex flex-col items-center justify-center h-screen bg-gray-100 dark:bg-gray-900">
       <div class="relative w-1/2 h-1/2 flex items-center justify-center">
         <img
-          ref="vIcon"
-          src="/home/barbosa/projects/vins_collection/kujimwalo/public/assets/icons/letter-v-svgrepo-com.svg"
-          alt="Loading..."
-          class="loading-icon w-full h-full object-contain"
-          style="filter: grayscale(100%) brightness(80%);"
-        />
+  ref="vIcon"
+  src="/assets/icons/letter-v-svgrepo-com.svg"
+  alt="Loading..."
+  class="loading-icon w-full h-full object-contain"
+  style="filter: grayscale(100%) brightness(80%);"
+/>
         <div class="shine absolute top-0 left-0 w-full h-full bg-gradient-to-b from-yellow-400 to-transparent opacity-50" />
       </div>
      
@@ -40,8 +40,8 @@
   <style scoped>
 
   
-  .shine {
-    mask-image: url('/home/barbosa/projects/vins_collection/kujimwalo/public/assets/icons/letter-v-svgrepo-com.svg');
+.shine {
+  mask-image: url('/assets/icons/letter-v-svgrepo-com.svg');
     mask-repeat: no-repeat;
     mask-position: center;
     animation: shineAnimation 2s ease-in-out infinite alternate;
