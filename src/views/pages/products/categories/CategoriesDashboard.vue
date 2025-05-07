@@ -109,11 +109,11 @@ const fetchCategories = async () => {
   try {
     const authToken = authStore.token
 
-    if (!authToken) {
-      alert("You need to log in first.");
-      router.push('/signin');
-      return;
-    }
+    // if (!authToken) {
+    //   alert("You need to log in first.");
+    //   router.push('/signin');
+    //   return;
+    // }
     const response = await axios.get(`${api.baseURL}/category`, {
       headers: {
         Authorization: `Bearer ${authToken}`, // Ensure the correct format

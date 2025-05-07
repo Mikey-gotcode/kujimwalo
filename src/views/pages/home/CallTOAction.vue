@@ -3,7 +3,7 @@
     <!-- Background Image -->
     <div
       class="absolute inset-0 bg-cover bg-center"
-      :style="{ backgroundImage: `url(barcounter.jpeg)` }"
+      :style="{ backgroundImage: `url(/vins_collection.jpg)` }"
     ></div>
 
     <!-- Overlay -->
@@ -12,7 +12,7 @@
     <!-- Content -->
     <div class="relative z-20 text-center px-6 sm:px-10">
       <h1 class="text-3xl sm:text-5xl md:text-6xl font-bold">
-        KUJIMWALO!
+        VINS COLLECTION
       </h1>
       <div class="overflow-hidden w-full mt-2">
         <h1 ref="typedRef" class="text-xl sm:text-2xl md:text-3xl font-light text-white"></h1>
@@ -34,7 +34,7 @@ const typedRef = ref();
 
 onMounted(() => {
   if (typedRef.value) {
-    const typed_strings = ["SMALL WORLD!", "GOOD VIBES!", "ORDER NOW!"];
+    const typed_strings = ["A MUST HAVE!", "A MUST WANT!", "ORDER NOW!"];
 
     new Typed(typedRef.value, {
       strings: typed_strings,

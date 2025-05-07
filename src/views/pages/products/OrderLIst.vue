@@ -2,6 +2,8 @@
 import { ref, onMounted, onUnmounted, defineProps, inject, computed, watch } from 'vue';
 import axios from 'axios';
 import api from '../../../api';
+//import KeyPad from '../../../components/KeyPad.vue';
+import PreviewMpesa from '../../../components/PreviewMpesa.vue';
 import { useAuthStore } from '../../../store/auth';
 import { useRouter } from 'vue-router';
 
@@ -19,8 +21,14 @@ const selectedStatus = ref('All orders');
 const loading = ref(true);
 const error = ref(null);
 let intervalId = null;
+const showPaymentOptions = ref(null);
+//const showCashModal = ref({});
+const showMpesaModal = ref({});
 const currentPage = ref(1);
 const itemsPerPage = 5;
+const selectedOrder  = ref(null);
+const selectedMethod = ref(null);
+
 
 // Inject theme from the provider
 const theme = inject('theme', ref('light')); // Default to light if not provided
@@ -86,6 +94,15 @@ const prevPage = () => {
     currentPage.value--;
   }
 };
+const togglePaymentOptions = (id) => {
+  showPaymentOptions.value = showPaymentOptions.value === id ? null : id;
+};
+
+const openMpesaKeyPad = (id, method) => {
+  showMpesaModal.value = { [id]: !showMpesaModal.value[id] };
+  selectedOrder.value = id;
+  selectedMethod.value = method;
+};
 
 const cancelOrder = async (id) => {
   try {
@@ -121,7 +138,7 @@ watch([filteredOrders, selectedStatus], () => {
                 <h2 :class="theme === 'light' ? 'text-black' : 'text-white'"
                     class="text-2xl font-semibold">
                     My Orders
-                </h2>
+            </h2>
                 <select v-model="selectedStatus" class="border border-gray-300 dark:border-gray-700 p-2 rounded-md">
                     <option>All orders</option>
                     <option value="pending">Pending</option>
@@ -130,6 +147,11 @@ watch([filteredOrders, selectedStatus], () => {
                     <option value="cancelled">Cancelled</option>
                 </select>
             </div>
+            <div className="flex items-center justify-center min-h-[35px] bg-gray-50">
+                            <p className="text-center text-lg text-gray-700">
+                              if you insist on making cash payments, please contact the supplier in order to dispatch your order
+                            </p>
+                          </div>
             <div v-if="totalPages > 1" class="flex justify-center mt-6 gap-4">
           <button
             @click="prevPage"
@@ -177,8 +199,32 @@ watch([filteredOrders, selectedStatus], () => {
                                     class="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded-md">
                                     Cancel
                                 </button>
+                                <button @click="togglePaymentOptions(order.id)"
+                                  class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md">
+                                  Process Payment
+                                </button>
                             </template>
+                            
                         </div>
+                        
+                        <div v-if="showPaymentOptions === order.id"
+                          class="mt-4 p-4 border border-gray-300 dark:border-gray-700 rounded-md bg-gray-100 dark:bg-gray-700 w-full">
+                          <p class="text-gray-700 dark:text-gray-300 font-medium text-center">Choose Payment Method:</p>
+                          <div class="mt-2 flex flex-wrap gap-2 justify-center">
+                            <button @click="togglePaymentOptions(null)" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md">
+                              Cancel
+                            </button>
+                            <button @click="openMpesaKeyPad(order.id,'mpesa')" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md">
+                              MPESA Payment
+                            </button>
+                          </div>
+                         
+
+                          <PreviewMpesa v-if="showMpesaModal[order.id]" :isOpen="showMpesaModal[order.id]" :orderID="order.id"
+                            :billAmount="Number(order.total_price)" :orderNo="order.customer.phone" :paymentMethod="selectedMethod"
+                            title="PreviewMpesa" @close="showMpesaModal[order.id]=false" @paymentSuccess="fetchOrders" />
+                        </div>
+
                     </div>
                 </div>
             </div>

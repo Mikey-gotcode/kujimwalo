@@ -78,6 +78,7 @@
 </template>
 
 <script setup>
+
 import { defineProps, defineEmits, ref, watch, inject } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
@@ -87,10 +88,10 @@ import api from '../api';
 const props = defineProps({
     isOpen: Boolean,
     billAmount: Number,
-    orderNo: String, 
+    orderNo: String,
     orderID: Number,
     paymentMethod: String,
-    title: String 
+    title: String
 });
 
 const emit = defineEmits(['close', 'paymentSuccess']);
@@ -98,10 +99,60 @@ const router = useRouter();
 const authStore = useAuthStore();
 const theme = inject('theme');
 
-const numbers = ref([...Array(10).keys()]); 
+const numbers = ref([...Array(10).keys()]);
 const amount = ref(props.billAmount?.toString() || '');
+const alertMessage = ref('');
 const phone = ref(props.orderNo || '');
 const editingField = ref('amount');
+const pollingInterval = 3000; // Check status every 3 seconds
+const pollingTimeout = 60000; // Stop polling after 60 seconds
+const isPolling = ref(false);
+let pollingIntervalId = null;
+let pollingStartTime = null;
+
+const startPolling = (checkoutRequestId) => {
+    isPolling.value = true;
+    pollingStartTime = Date.now();
+    pollingIntervalId = setInterval(async () => {
+        try {
+            const response = await axios.get(`${api.baseURL}/mpesa/stk/status/${checkoutRequestId}`, {
+                headers: {
+                    Authorization: `Bearer ${authStore.token}`,
+                    Accept: 'application/json'
+                },
+                withCredentials: true
+            });
+
+            if (response.data.result_code === 0) {
+                console.log('Payment successful! Data:', response.data);
+                clearInterval(pollingIntervalId);
+                isPolling.value = false;
+                showAlert("Payment successful!");
+                emit('paymentSuccess', response.data);
+                setTimeout(() => closeModal(), 2000);
+            } else if (response.data.result_code !== null && response.data.result_code !== 0) {
+                console.error('Payment failed:', response.data.result_desc, `(Code: ${response.data.result_code})`);
+                showAlert(`Payment failed: ${response.data.result_desc} (Code: ${response.data.result_code})`);
+                clearInterval(pollingIntervalId); // Stop polling on failure
+                isPolling.value = false;
+            } else {
+                console.log('Waiting for payment...');
+                // Continue polling
+                if (Date.now() - pollingStartTime > pollingTimeout) {
+                    clearInterval(pollingIntervalId);
+                    isPolling.value = false;
+                    showAlert("Payment timed out. Please try again.");
+                }
+            }
+        } catch (error) {
+            console.error('Error checking STK status:', error);
+            clearInterval(pollingIntervalId);
+            isPolling.value = false;
+            showAlert("Error checking payment status. Please try again.");
+        }
+    }, pollingInterval);
+};
+
 
 watch(() => props.orderNo, (newPhone) => {
     phone.value = newPhone;
@@ -150,7 +201,7 @@ const submitForm = async () => {
             return;
         }
 
-        const response = await axios.post(`${api.baseURL}/stkpush`, {
+        const response = await axios.post(`${api.baseURL}/mpesa/stkpush`, {
             amount: parseInt(amount.value),
             phone: phone.value,
             account_number: '12345',
@@ -164,19 +215,20 @@ const submitForm = async () => {
             withCredentials: true
         });
 
-        if (response.data.success) {
-            showAlert(response.data.message || "Payment successful");
-            emit('paymentSuccess');
-            setTimeout(() => closeModal(), 2000);
+        if (response.data.checkout_request_id) {
+            showAlert(response.data.message || "STK push initiated. Please check your phone to enter your PIN.");
+            startPolling(response.data.checkout_request_id);
         } else {
-            showAlert(`Payment failed: ${response.data.message}`);
+            showAlert(`Payment initiation failed: ${response.data.error || response.data.message}`);
         }
     } catch (error) {
-        showAlert(error.response?.data || "Payment failed");
+        showAlert(error.response?.data.message || "Payment initiation failed");
+        console.error("STK Push Error:", error.response?.data || error);
     }
 };
 
 const showAlert = (message) => {
+    console.log('Alert:', message); // Temporary for debugging
     alertMessage.value = message;
     setTimeout(() => {
         alertMessage.value = "";

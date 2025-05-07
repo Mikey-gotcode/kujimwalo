@@ -109,7 +109,7 @@ import api from "../../../api";
 import { useAuthStore } from "../../../store/auth";
 
 // Inject theme from parent provider
-const theme = inject("theme");
+const theme = inject("theme","light","dark");
 
 // Form fields
 const currentPassword = ref("");
