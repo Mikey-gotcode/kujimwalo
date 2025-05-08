@@ -68,22 +68,45 @@ const removeFromCart = (id) => {
 const toggleCart = () => nextTick(() => (showCart.value = !showCart.value));
 
 const checkout = async () => {
-  if (!authStore.token) return router.push('/signin');
+  // Redirect to sign‐in if missing token
+  if (!authStore.token) {
+    alert("Please log in first.");
+    return router.push('/signin');
+  }
+
+  // Build your combined payload
   const payload = {
     user_id: authStore.user.id,
-    items: cart.value.map(i => ({ product_id: i.id, quantity: i.quantity }))
+    items: cart.value.map(i => ({
+      product_id: i.id,
+      quantity:   i.quantity
+    }))
   };
+
   try {
-    await api.post('/orders', payload, {
-      headers: { Authorization: `Bearer ${authStore.token}`, Accept: 'application/json', 'Content-Type': 'application/json' },
-      withCredentials: true
-    });
+    // Send payload as 2nd arg, config (headers) as 3rd
+    await api.post(
+      '/orders',
+      payload,
+      {
+        headers: {
+          Accept: 'application/json',
+          // You can omit this if interceptor handles it:
+          Authorization: `Bearer ${authStore.token}`,
+        },
+        // withCredentials: true, // Uncomment only if needed
+      }
+    );
+
     alert('Order placed successfully!');
     cart.value = [];
+
   } catch (e) {
-    console.error(e);
+    console.error("Checkout error:", e.response || e.message);
+    alert("Could not place order: " + (e.response?.data?.message || e.message));
   }
 };
+
 
 const loadProducts = async () => {
   loading.value = true; error.value = null;

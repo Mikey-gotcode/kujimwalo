@@ -166,38 +166,66 @@ const toggleCart = () => {
   });
 };
 const checkout = async () => {
-  console.log("shopping cart:",cart.value)
-  try {
-    const authToken = authStore.token;
+  console.log("shopping cart:", cart.value);
 
-    if (!authToken) {
-      alert("You need to log in first.");
-      router.push('/signin');
-      return;
-    }
-    const orderResponse = await api.post('/orders', {
-      headers: {
-        Authorization: `Bearer ${authToken}`, // Ensure the correct format
-        Accept: 'application/json', // Sometimes required for Laravel-based APIs
-      },
-      withCredentials: true, // Important if using Laravel Sanctum
-    }, { items: cart.value });
+  // Ensure we have a token
+  if (!authStore.token) {
+    alert("You need to log in first.");
+    return router.push('/signin');
+  }
+
+  // Build the order payload
+  const payload = {
+    user_id: authStore.user.id,
+    items: cart.value.map(item => ({
+      product_id: item.id,
+      quantity: item.quantity
+    }))
+  };
+
+  try {
+    // 1️⃣ Create the order
+    const orderResponse = await api.post(
+      '/orders',
+      payload,
+      {
+        headers: {
+          Accept: 'application/json',
+          // Authorization is also injected by your interceptor,
+          // but you can leave this here if you prefer explicitness:
+          Authorization: `Bearer ${authStore.token}`,
+        },
+        // withCredentials: true, // only if you need Sanctum cookies
+      }
+    );
+
     const orderId = orderResponse.data.id;
-    
+
+    // 2️⃣ Attach items one by one (if your API requires separate endpoint)
     for (const item of cart.value) {
-      await api.post('/order_items/', {
-      headers: {
-        Authorization: `Bearer ${authToken}`, // Ensure the correct format
-        Accept: 'application/json', // Sometimes required for Laravel-based APIs
-      },
-      withCredentials: true, // Important if using Laravel Sanctum
-    },{ orderId, productId: item.id, quantity: item.quantity });
+      await api.post(
+        '/order_items',
+        {
+          order_id:   orderId,
+          product_id: item.id,
+          quantity:   item.quantity,
+        },
+        {
+          headers: {
+            Accept: 'application/json',
+            Authorization: `Bearer ${authStore.token}`,
+          },
+          // withCredentials: true,
+        }
+      );
     }
-    
+
     alert("Order placed successfully!");
     cart.value = [];
+
   } catch (error) {
-    console.error("Error processing order:", error);
+    console.error("Error processing order:", error.response || error.message);
+    alert("Failed to place order: " + (error.response?.data?.message || error.message));
   }
 };
 
