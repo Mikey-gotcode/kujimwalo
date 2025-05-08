@@ -3,7 +3,7 @@ import axios from 'axios';
 const api = axios.create({
   baseURL: 'http://www.vinscollections.shop/api', // Include the protocol (http/https)
   headers: {
-    'Content-Type': 'application/json',
+    
     // You can add other default headers here if needed
   },
   withCredentials: true, // If your API requires sending cookies (e.g., for Laravel Sanctum)
