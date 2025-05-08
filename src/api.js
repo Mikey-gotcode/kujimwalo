@@ -10,18 +10,14 @@ const api = axios.create({
 });
 
 // Example of a request interceptor (for adding auth tokens)
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token'); // Or however you store your token
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
+api.interceptors.request.use(config => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
-);
+  console.log('[API REQUEST]', config.method, config.url, '→ headers:', config.headers);
+  return config;
+});
 
 // Example of a response interceptor (for handling errors or data transformations)
 api.interceptors.response.use(

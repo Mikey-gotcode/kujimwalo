@@ -94,7 +94,7 @@ const checkout = async () => {
           // You can omit this if interceptor handles it:
           Authorization: `Bearer ${authStore.token}`,
         },
-        // withCredentials: true, // Uncomment only if needed
+        withCredentials: true, // Uncomment only if needed
       }
     );
 

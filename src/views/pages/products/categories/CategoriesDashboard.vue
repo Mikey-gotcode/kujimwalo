@@ -195,7 +195,7 @@ const checkout = async () => {
           // but you can leave this here if you prefer explicitness:
           Authorization: `Bearer ${authStore.token}`,
         },
-        // withCredentials: true, // only if you need Sanctum cookies
+        withCredentials: true, // only if you need Sanctum cookies
       }
     );
 
@@ -215,7 +215,7 @@ const checkout = async () => {
             Accept: 'application/json',
             Authorization: `Bearer ${authStore.token}`,
           },
-          // withCredentials: true,
+          withCredentials: true,
         }
       );
     }
