@@ -102,30 +102,26 @@ const error = ref(null);
 
 
 
-// Fetch categories and dynamically create categoryMap
 const fetchCategories = async () => {
   loading.value = true;
   error.value = null;
   try {
-    const authToken = authStore.token
+    const authToken = authStore.token;
 
-    // if (!authToken) {
-    //   alert("You need to log in first.");
-    //   router.push('/signin');
-    //   return;
-    // }
     const response = await axios.get('/category', {
       headers: {
-        Authorization: `Bearer ${authToken}`, // Ensure the correct format
-        Accept: 'application/json', // Sometimes required for Laravel-based APIs
+        Authorization: `Bearer ${authToken}`,
+        Accept: 'application/json',
       },
-      withCredentials: true, // Important if using Laravel Sanctum
+      withCredentials: true,
     });
-    
+
+    console.log('Category Response Data:', response.data); // Keep this for debugging
+
     tabs.value = response.data.map((category, index) => ({
       id: category.id, // Unique ID from API
       label: category.name,
-      count: category.productCount || 0,
+      count: 0, // productCount is not present, so default to 0 or handle accordingly
     }));
 
     // Generate a dynamic categoryMap from API response
@@ -141,11 +137,10 @@ const fetchCategories = async () => {
   } catch (error) {
     error.value = "Failed to fetch products. Please try again later.";
     console.error('Error fetching categories:', error);
-  }finally {
+  } finally {
     loading.value = false;
   }
 };
-
 // Function to update selectedTab
 const selectTab = (tabId) => {
   selectedTab.value = tabId;
