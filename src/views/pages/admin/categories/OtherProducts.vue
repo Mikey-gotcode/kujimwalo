@@ -147,6 +147,11 @@ const router = useRouter();
 const isInStock = (product) => product.stock_quantity > 0;
 
 const getImageUrl = (product) => {
+  console.log('API Object in getImageUrl:', api); // Debugging
+  if (!api || !api.baseURL) {
+    console.error('api or api.baseURL is undefined!');
+    return 'default-image.jpg'; // Prevent further errors
+  }
   if (!product.images.length) return 'default-image.jpg';
   const idx = activeImageIndex.value[product.id] || 0;
   return `${api.baseURL}/${product.images[idx].image_path}`;
