@@ -1,3 +1,145 @@
+  <script setup>
+  import { ref, onBeforeMount, watch, defineProps, computed, inject } from 'vue';
+  //import axios from 'axios';
+  import api from '../../../../api';
+  import { useAuthStore } from '../../../../store/auth';
+  import { useRouter } from 'vue-router';
+  
+  const props = defineProps({ activeTab: Number });
+  const products = ref([]);
+  const allProducts = ref([]);
+  const activeImageIndex = ref({});
+  const loading = ref(true);
+  const error = ref(null);
+  const selectedProduct = ref(null);
+  const theme = inject('theme');
+  const successMessage = ref('');
+  const imageFile = ref(null);
+  const currentPage = ref(1);
+  const itemsPerPage = 6;
+  
+  const authStore = useAuthStore();
+  const router = useRouter();
+  
+  const isInStock = (product) => product.stock_quantity > 0;
+  
+  const getImageUrl = computed(() => (product) => {
+    if (!api || !api.baseURL) {
+      console.error('api or api.baseURL is undefined in computed!');
+      return 'default-image.jpg';
+    }
+    if (!product.images.length) return 'default-image.jpg';
+    const idx = activeImageIndex.value[product.id] || 0;
+    return `${api.baseURL}/${product.images[idx].image_path}`;
+  });
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file && file.size <= 5 * 1024 * 1024) imageFile.value = file;
+    else alert('File size exceeds 5MB limit.');
+  };
+  
+  const prevImage = (productId) => {
+    const idx = activeImageIndex.value[productId] || 0;
+    activeImageIndex.value[productId] = Math.max(idx - 1, 0);
+  };
+  
+  const nextImage = (productId, total) => {
+    const idx = activeImageIndex.value[productId] || 0;
+    activeImageIndex.value[productId] = Math.min(idx + 1, total - 1);
+  };
+  
+  const editProduct = (product) => {
+    selectedProduct.value = { ...product };
+  };
+  
+  const saveChanges = async () => {
+    if (!selectedProduct.value.name || !selectedProduct.value.price || !selectedProduct.value.stock_quantity) {
+      alert('All fields are required.');
+      return;
+    }
+    try {
+      const token = authStore.token;
+      const url = `/products/${selectedProduct.value.id}`;
+  
+      const form = new FormData();
+      form.append('name', selectedProduct.value.name);
+      form.append('price', parseFloat(selectedProduct.value.price));
+      form.append('stock_quantity', parseInt(selectedProduct.value.stock_quantity));
+      form.append('_method', 'PATCH');
+      if (imageFile.value) form.append('images[]', imageFile.value);
+  
+      await api.post(url, form, {
+        headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+        withCredentials: true,
+      });
+  
+      imageFile.value = null;
+      selectedProduct.value = null;
+      showSuccessMessage('Product updated successfully!');
+      await loadProducts();
+    } catch (err) {
+      console.error(err);
+      alert('Failed to update product.');
+    }
+  };
+  
+  const confirmDelete = async (id) => {
+    if (!confirm('Are you sure?')) return;
+    try {
+      const token = authStore.token;
+      await api.delete(`/products/${id}`, {
+        headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+        withCredentials: true,
+      });
+      products.value = products.value.filter(p => p.id !== id);
+      showSuccessMessage('Product deleted successfully!');
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  
+  const showSuccessMessage = (msg) => {
+    successMessage.value = msg;
+    setTimeout(() => successMessage.value = '', 3000);
+  };
+  
+  const loadProducts = async () => {
+    loading.value = true;
+    error.value = null;
+    try {
+      const token = authStore.token;
+      if (!token) { router.push('/signin'); return; }
+  
+      const res = await api.get('/products', {
+        headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+        withCredentials: true,
+      });
+  
+      allProducts.value = Array.isArray(res.data) ? res.data : [];  
+      products.value = props.activeTab
+        ? allProducts.value.filter(p => p.category_id === props.activeTab)
+        : allProducts.value;
+  
+      products.value.forEach(p => (activeImageIndex.value[p.id] = 0));
+    } catch (err) {
+      error.value = 'Failed to fetch products.';
+      console.error(err);
+    } finally {
+      loading.value = false;
+    }
+  };
+  
+  const totalPages = computed(() => Math.ceil(products.value.length / itemsPerPage));
+  const paginatedProducts = computed(() => {
+    const start = (currentPage.value - 1) * itemsPerPage;
+    return products.value.slice(start, start + itemsPerPage);
+  });
+  const nextPage = () => { if (currentPage.value < totalPages.value) currentPage.value++; };
+  const prevPage = () => { if (currentPage.value > 1) currentPage.value--; };
+  
+  onBeforeMount(loadProducts);
+  watch(() => props.activeTab, loadProducts);
+  </script>
 <template>
   <div v-if="loading" class="flex justify-center items-center">
     <div aria-label="Loading..." role="status" class="flex items-center space-x-2">
@@ -121,147 +263,3 @@
   </div>
 </template>
 
-<script setup>
-import { ref, onBeforeMount, watch, defineProps, computed, inject } from 'vue';
-//import axios from 'axios';
-import api from '../../../../api';
-import { useAuthStore } from '../../../../store/auth';
-import { useRouter } from 'vue-router';
-
-const props = defineProps({ activeTab: Number });
-const products = ref([]);
-const allProducts = ref([]);
-const activeImageIndex = ref({});
-const loading = ref(true);
-const error = ref(null);
-const selectedProduct = ref(null);
-const theme = inject('theme');
-const successMessage = ref('');
-const imageFile = ref(null);
-const currentPage = ref(1);
-const itemsPerPage = 6;
-
-const authStore = useAuthStore();
-const router = useRouter();
-
-const isInStock = (product) => product.stock_quantity > 0;
-
-const getImageUrl = (product) => {
-  console.log('API Object in getImageUrl:', api); // Debugging
-  if (!api || !api.baseURL) {
-    console.error('api or api.baseURL is undefined!');
-    return 'default-image.jpg'; // Prevent further errors
-  }
-  if (!product.images.length) return 'default-image.jpg';
-  const idx = activeImageIndex.value[product.id] || 0;
-  return `${api.baseURL}/${product.images[idx].image_path}`;
-};
-
-const handleImageUpload = (e) => {
-  const file = e.target.files[0];
-  if (file && file.size <= 5 * 1024 * 1024) imageFile.value = file;
-  else alert('File size exceeds 5MB limit.');
-};
-
-const prevImage = (productId) => {
-  const idx = activeImageIndex.value[productId] || 0;
-  activeImageIndex.value[productId] = Math.max(idx - 1, 0);
-};
-
-const nextImage = (productId, total) => {
-  const idx = activeImageIndex.value[productId] || 0;
-  activeImageIndex.value[productId] = Math.min(idx + 1, total - 1);
-};
-
-const editProduct = (product) => {
-  selectedProduct.value = { ...product };
-};
-
-const saveChanges = async () => {
-  if (!selectedProduct.value.name || !selectedProduct.value.price || !selectedProduct.value.stock_quantity) {
-    alert('All fields are required.');
-    return;
-  }
-  try {
-    const token = authStore.token;
-    const url = `/products/${selectedProduct.value.id}`;
-
-    const form = new FormData();
-    form.append('name', selectedProduct.value.name);
-    form.append('price', parseFloat(selectedProduct.value.price));
-    form.append('stock_quantity', parseInt(selectedProduct.value.stock_quantity));
-    form.append('_method', 'PATCH');
-    if (imageFile.value) form.append('images[]', imageFile.value);
-
-    await api.post(url, form, {
-      headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
-      withCredentials: true,
-    });
-
-    imageFile.value = null;
-    selectedProduct.value = null;
-    showSuccessMessage('Product updated successfully!');
-    await loadProducts();
-  } catch (err) {
-    console.error(err);
-    alert('Failed to update product.');
-  }
-};
-
-const confirmDelete = async (id) => {
-  if (!confirm('Are you sure?')) return;
-  try {
-    const token = authStore.token;
-    await api.delete(`/products/${id}`, {
-      headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
-      withCredentials: true,
-    });
-    products.value = products.value.filter(p => p.id !== id);
-    showSuccessMessage('Product deleted successfully!');
-  } catch (err) {
-    console.error(err);
-  }
-};
-
-const showSuccessMessage = (msg) => {
-  successMessage.value = msg;
-  setTimeout(() => successMessage.value = '', 3000);
-};
-
-const loadProducts = async () => {
-  loading.value = true;
-  error.value = null;
-  try {
-    const token = authStore.token;
-    if (!token) { router.push('/signin'); return; }
-
-    const res = await api.get('/products', {
-      headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
-      withCredentials: true,
-    });
-
-    allProducts.value = Array.isArray(res.data) ? res.data : [];  
-    products.value = props.activeTab
-      ? allProducts.value.filter(p => p.category_id === props.activeTab)
-      : allProducts.value;
-
-    products.value.forEach(p => (activeImageIndex.value[p.id] = 0));
-  } catch (err) {
-    error.value = 'Failed to fetch products.';
-    console.error(err);
-  } finally {
-    loading.value = false;
-  }
-};
-
-const totalPages = computed(() => Math.ceil(products.value.length / itemsPerPage));
-const paginatedProducts = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage;
-  return products.value.slice(start, start + itemsPerPage);
-});
-const nextPage = () => { if (currentPage.value < totalPages.value) currentPage.value++; };
-const prevPage = () => { if (currentPage.value > 1) currentPage.value--; };
-
-onBeforeMount(loadProducts);
-watch(() => props.activeTab, loadProducts);
-</script>

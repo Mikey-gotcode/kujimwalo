@@ -1,3 +1,113 @@
+<script setup>
+import { ref, onBeforeMount, watch, defineProps, nextTick, inject, computed } from 'vue';
+//import axios from 'axios';
+import api from '../../../../api';
+import { useAuthStore } from '../../../../store/auth';
+import { useCartStore } from '../../../../store/cart';
+import { useRouter } from 'vue-router';
+
+const props = defineProps({ activeTab: Number });
+const products = ref([]);
+const allProducts = ref([]);
+const loading = ref(true);
+const error = ref(null);
+const cart = ref([]);
+const quantities = ref({});
+const showCart = ref(false);
+const theme = inject('theme');
+const currentPage = ref(1);
+const itemsPerPage = 6;
+
+const authStore = useAuthStore();
+const cartStore = useCartStore();
+const router = useRouter();
+
+const isInStock = (product) => product.stock_quantity > 0;
+
+const activeImageIndex = ref({});
+
+const getImageUrl = computed(() => (product) => {
+  if (!api || !api.baseURL) {
+    console.error('api or api.baseURL is undefined in computed!');
+    return 'default-image.jpg';
+  }
+  if (!product.images.length) return 'default-image.jpg';
+  const idx = activeImageIndex.value[product.id] || 0;
+  return `<span class="math-inline">\{api\.baseURL\}/</span>{product.images[idx].image_path}`;
+});
+
+const prevImage = (productId) => {
+  const idx = activeImageIndex.value[productId] || 0;
+  activeImageIndex.value[productId] = Math.max(idx - 1, 0);
+};
+
+const nextImage = (productId, total) => {
+  const idx = activeImageIndex.value[productId] || 0;
+  activeImageIndex.value[productId] = Math.min(idx + 1, total - 1);
+};
+
+const increaseQuantity = (product) => {
+  quantities.value[product.id] = (quantities.value[product.id] || 0) + 1;
+};
+const decreaseQuantity = (product) => {
+  quantities.value[product.id] = Math.max((quantities.value[product.id] || 0) - 1, 0);
+};
+
+const addToCart = (product) => {
+  const existing = cart.value.find(i => i.id === product.id);
+  if (existing) existing.quantity = quantities.value[product.id];
+  else {
+    cart.value.push({ ...product, quantity: quantities.value[product.id] });
+    cartStore.setCartItems(cart.value, authStore.token);
+  }
+};
+
+const removeFromCart = (id) => {
+  cart.value = cart.value.filter(i => i.id !== id);
+};
+
+const toggleCart = () => nextTick(() => (showCart.value = !showCart.value));
+
+const checkout = async () => {
+  if (!authStore.token) return router.push('/signin');
+  const payload = {
+    user_id: authStore.user.id,
+    items: cart.value.map(i => ({ product_id: i.id, quantity: i.quantity }))
+  };
+  try {
+    await api.post('/orders', payload, {
+      headers: { Authorization: `Bearer ${authStore.token}`, Accept: 'application/json', 'Content-Type': 'application/json' },
+      withCredentials: true
+    });
+    alert('Order placed successfully!');
+    cart.value = [];
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+const loadProducts = async () => {
+  loading.value = true; error.value = null;
+  //if (!authStore.token) return router.push('/signin');
+  try {
+    const res = await api.get('/products', { headers: { Authorization: `Bearer ${authStore.token}`, Accept: 'application/json' }, withCredentials: true });
+    allProducts.value = Array.isArray(res.data) ? res.data : [];
+    products.value = props.activeTab ? allProducts.value.filter(p => p.category_id === props.activeTab) : allProducts.value;
+    products.value.forEach(p => { quantities.value[p.id] = quantities.value[p.id] || 0; activeImageIndex.value[p.id] = 0; });
+  } catch (e) {
+    error.value = 'Failed to fetch products.';
+    console.error(e);
+  } finally { loading.value = false; }
+};
+
+const totalPages = computed(() => Math.ceil(products.value.length / itemsPerPage));
+const paginatedProducts = computed(() => { const start = (currentPage.value - 1) * itemsPerPage; return products.value.slice(start, start + itemsPerPage); });
+const nextPage = () => { if (currentPage.value < totalPages.value) currentPage.value++; };
+const prevPage = () => { if (currentPage.value > 1) currentPage.value--; };
+
+onBeforeMount(loadProducts);
+watch(() => props.activeTab, loadProducts);
+</script>
 <template>
   <div class="p-4 md:p-6">
     <!-- Product Grid -->
@@ -22,7 +132,7 @@
         <!-- Image Carousel -->
         <div class="relative overflow-hidden w-full aspect-[4/3]">
           <img
-            :src="getImageUrl(product)"
+            :src="getImageUrl(product,api.baseURL)"
             :alt="product.name"
             class="w-full h-full object-cover rounded-lg"
           />
@@ -168,114 +278,3 @@
   </div>
 </template>
 
-<script setup>
-import { ref, onBeforeMount, watch, defineProps, nextTick, inject, computed } from 'vue';
-//import axios from 'axios';
-import api from '../../../../api';
-import { useAuthStore } from '../../../../store/auth';
-import { useCartStore } from '../../../../store/cart';
-import { useRouter } from 'vue-router';
-
-const props = defineProps({ activeTab: Number });
-const products = ref([]);
-const allProducts = ref([]);
-const loading = ref(true);
-const error = ref(null);
-const cart = ref([]);
-const quantities = ref({});
-const showCart = ref(false);
-const theme = inject('theme');
-const currentPage = ref(1);
-const itemsPerPage = 6;
-
-const authStore = useAuthStore();
-const cartStore = useCartStore();
-const router = useRouter();
-
-const isInStock = (product) => product.stock_quantity > 0;
-
-const activeImageIndex = ref({});
-
-const getImageUrl = (product) => {
-  console.log('API Object in getImageUrl:', api); // Debugging
-  if (!api || !api.baseURL) {
-    console.error('api or api.baseURL is undefined!');
-    return 'default-image.jpg'; // Prevent further errors
-  }
-  if (!product.images.length) return 'default-image.jpg';
-  const idx = activeImageIndex.value[product.id] || 0;
-  return `${api.baseURL}/${product.images[idx].image_path}`;
-};
-
-const prevImage = (productId) => {
-  const idx = activeImageIndex.value[productId] || 0;
-  activeImageIndex.value[productId] = Math.max(idx - 1, 0);
-};
-
-const nextImage = (productId, total) => {
-  const idx = activeImageIndex.value[productId] || 0;
-  activeImageIndex.value[productId] = Math.min(idx + 1, total - 1);
-};
-
-const increaseQuantity = (product) => {
-  quantities.value[product.id] = (quantities.value[product.id] || 0) + 1;
-};
-const decreaseQuantity = (product) => {
-  quantities.value[product.id] = Math.max((quantities.value[product.id] || 0) - 1, 0);
-};
-
-const addToCart = (product) => {
-  const existing = cart.value.find(i => i.id === product.id);
-  if (existing) existing.quantity = quantities.value[product.id];
-  else {
-    cart.value.push({ ...product, quantity: quantities.value[product.id] });
-    cartStore.setCartItems(cart.value, authStore.token);
-  }
-};
-
-const removeFromCart = (id) => {
-  cart.value = cart.value.filter(i => i.id !== id);
-};
-
-const toggleCart = () => nextTick(() => (showCart.value = !showCart.value));
-
-const checkout = async () => {
-  if (!authStore.token) return router.push('/signin');
-  const payload = {
-    user_id: authStore.user.id,
-    items: cart.value.map(i => ({ product_id: i.id, quantity: i.quantity }))
-  };
-  try {
-    await api.post('/orders', payload, {
-      headers: { Authorization: `Bearer ${authStore.token}`, Accept: 'application/json', 'Content-Type': 'application/json' },
-      withCredentials: true
-    });
-    alert('Order placed successfully!');
-    cart.value = [];
-  } catch (e) {
-    console.error(e);
-  }
-};
-
-const loadProducts = async () => {
-  loading.value = true; error.value = null;
-  //if (!authStore.token) return router.push('/signin');
-  try {
-    const res = await api.get('/products', { headers: { Authorization: `Bearer ${authStore.token}`, Accept: 'application/json' }, withCredentials: true });
-    allProducts.value = Array.isArray(res.data) ? res.data : [];
-    products.value = props.activeTab ? allProducts.value.filter(p => p.category_id === props.activeTab) : allProducts.value;
-    products.value.forEach(p => { quantities.value[p.id] = quantities.value[p.id] || 0; activeImageIndex.value[p.id] = 0; });
-  } catch (e) {
-    error.value = 'Failed to fetch products.';
-    console.error(e);
-  } finally { loading.value = false; }
-};
-
-const totalPages = computed(() => Math.ceil(products.value.length / itemsPerPage));
-const paginatedProducts = computed(() => { const start = (currentPage.value - 1) * itemsPerPage; return products.value.slice(start, start + itemsPerPage); });
-const nextPage = () => { if (currentPage.value < totalPages.value) currentPage.value++; };
-const prevPage = () => { if (currentPage.value > 1) currentPage.value--; };
-
-onBeforeMount(loadProducts);
-watch(() => props.activeTab, loadProducts);
-</script>
