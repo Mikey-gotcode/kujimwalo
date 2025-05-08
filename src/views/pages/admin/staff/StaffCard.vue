@@ -81,7 +81,7 @@ onMounted(async () => {
       router.push('/signin');
       return;
       }
-    const response = await axios.get(`${api.baseURL}/user/`, {
+    const response = await axios.get('/user/', {
     headers: {
       Authorization: `Bearer ${authToken}`,
       Accept: 'application/json',

@@ -36,7 +36,7 @@ export const useAuthStore = defineStore('auth', {
     async login(formData, router) {
       try {
         // Send login request to backend API
-        const response = await axios.post(`${api.baseURL}/login`, formData);
+        const response = await axios.post('/login', formData);
         
         // Extract user details and token
         const { user, token, role } = response.data;
@@ -56,7 +56,7 @@ export const useAuthStore = defineStore('auth', {
     async register(formData, router) {
       try {
         // Send register request to backend API
-        const response = await axios.post(`${api.baseURL}/register`, formData);
+        const response = await axios.post('/register', formData);
 
         // Extract user details
         const { user } = response.data;

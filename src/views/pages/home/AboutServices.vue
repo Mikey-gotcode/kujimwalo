@@ -71,7 +71,7 @@ const services = ref([
 
 const fetchCounterData = async () => {
   try {
-    const { data } = await axios.get(`${api.baseURL}/order-counts`);
+    const { data } = await axios.get('/order-counts');
     console.log("API Response Data:", data);
 
     receivedOrdersCount.value = data.received_orders;

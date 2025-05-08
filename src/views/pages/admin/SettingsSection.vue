@@ -131,7 +131,7 @@ const changePassword = async () => {
     }
 
     try {
-        const response = await axios.post(`${api.baseURL}/change-password`, {
+        const response = await axios.post('/change-password', {
             current_password: currentPassword.value,
             new_password: newPassword.value,
             new_password_confirmation: confirmPassword.value // Correct field name!
@@ -154,7 +154,7 @@ const changePassword = async () => {
 // Log Out Other Sessions
 const logoutSessions = async () => {
     try {
-        const response = await axios.post(`${api.baseURL}/logout-other-sessions`, {
+        const response = await axios.post('/logout-other-sessions', {
             password: logoutPassword.value
         }, {
          headers: {
@@ -176,7 +176,7 @@ const confirmDelete = () => {
 // Delete Account
 const deleteAccount = async () => {
     try {
-        const response = await axios.post(`${api.baseURL}/delete-account`, {
+        const response = await axios.post('/delete-account', {
             password: deletePassword.value
         }, { 
         headers: {

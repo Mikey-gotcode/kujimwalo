@@ -157,7 +157,7 @@ const fetchCategories = async () => {
       router.push('/signin');
       return;
     }
-    const response = await axios.get(`${api.baseURL}/category`, {
+    const response = await axios.get('/category', {
       headers: {
         Authorization: `Bearer ${authToken}`, // Ensure the correct format
         Accept: 'application/json', // Sometimes required for Laravel-based APIs

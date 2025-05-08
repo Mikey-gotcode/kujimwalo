@@ -48,7 +48,7 @@ const fetchOrders = async () => {
       router.push('/signin');
       return;
     }
-    const response = await axios.get(`${api.baseURL}/orders/${authStore.user.id}`, {
+    const response = await axios.get(`/orders/${authStore.user.id}`, {
       headers: { Authorization: `Bearer ${authToken}`, Accept: 'application/json' },
       withCredentials: true,
     });
@@ -113,7 +113,7 @@ const cancelOrder = async (id) => {
       router.push('/signin');
       return;
     }
-    await axios.post(`${api.baseURL}/orders/${id}/cancel`, null, {
+    await axios.post(`/orders/${id}/cancel`, null, {
       headers: { Authorization: `Bearer ${authToken}`, Accept: 'application/json' },
       withCredentials: true,
     });

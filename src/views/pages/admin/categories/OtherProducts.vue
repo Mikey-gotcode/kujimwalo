@@ -179,7 +179,7 @@ const saveChanges = async () => {
   }
   try {
     const token = authStore.token;
-    const url = `${api.baseURL}/products/${selectedProduct.value.id}`;
+    const url = `/products/${selectedProduct.value.id}`;
 
     const form = new FormData();
     form.append('name', selectedProduct.value.name);
@@ -207,7 +207,7 @@ const confirmDelete = async (id) => {
   if (!confirm('Are you sure?')) return;
   try {
     const token = authStore.token;
-    await axios.delete(`${api.baseURL}/products/${id}`, {
+    await axios.delete(`/products/${id}`, {
       headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
       withCredentials: true,
     });
@@ -230,7 +230,7 @@ const loadProducts = async () => {
     const token = authStore.token;
     if (!token) { router.push('/signin'); return; }
 
-    const res = await axios.get(`${api.baseURL}/products`, {
+    const res = await axios.get('/products', {
       headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
       withCredentials: true,
     });

@@ -196,7 +196,7 @@ const formatDate = (dateString) => new Date(dateString).toLocaleDateString();
       return;
     }
 
-    const response = await axios.get(`${api.baseURL}/orders`, {
+    const response = await axios.get('/orders', {
       headers: {
         Authorization: `Bearer ${authToken}`,
         Accept: 'application/json',
@@ -227,7 +227,7 @@ const refreshOrders = async () => {
     const authToken = authStore.token;
     if (!authToken) return;
 
-    const response = await axios.get(`${api.baseURL}/orders`, {
+    const response = await axios.get('/orders', {
       headers: {
         Authorization: `Bearer ${authToken}`,
         Accept: 'application/json',
@@ -297,7 +297,7 @@ const cancelOrder = async (id) => {
       router.push('/signin');
       return;
     }
-    await axios.post(`${api.baseURL}/orders/${id}/cancel`, {}, {
+    await axios.post(`/orders/${id}/cancel`, {}, {
       headers: {
         Authorization: `Bearer ${authToken}`,
         Accept: 'application/json',
@@ -318,7 +318,7 @@ const stashOrder = async (id) => {
       router.push('/signin');
       return;
     }
-    await axios.post(`${api.baseURL}/orders/${id}/stash`, {}, {
+    await axios.post(`/orders/${id}/stash`, {}, {
       headers: {
         Authorization: `Bearer ${authToken}`,
         Accept: 'application/json',

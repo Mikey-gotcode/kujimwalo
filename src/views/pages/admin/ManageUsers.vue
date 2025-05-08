@@ -384,7 +384,7 @@ const fetchUsers = async () => {
 
     try {
 
-        const response = await axios.get(`${api.baseURL}/users`, {
+        const response = await axios.get('/users', {
 
             headers: {
 
@@ -438,7 +438,7 @@ const fetchFilteredUsers = async () => {
         }
 
 
-        const response = await axios.get(`${api.baseURL}/users/search?${params.toString()}`, {
+        const response = await axios.get(`/users/search?${params.toString()}`, {
 
             headers: {
 
@@ -469,7 +469,7 @@ const createUser = async () => {
 
     try {
 
-        const response = await axios.post(`${api.baseURL}/register`, newUser.value, {
+        const response = await axios.post('/register', newUser.value, {
 
             headers: {
 

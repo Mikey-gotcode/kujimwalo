@@ -81,8 +81,8 @@ const expenses = ref([]);
             router.push('/signin');
             return;
          }
-       //console.log("form data:", formData);
-       const response = await axios.post(`${api.baseURL}/expenses`,formData,{
+      
+       const response = await axios.post('/expenses',formData,{
          headers: {
          Authorization: `Bearer ${authToken}`, // Ensure the correct format
          Accept: 'application/json', // Sometimes required for Laravel-based APIs
@@ -121,7 +121,7 @@ const expenses = ref([]);
       router.push('/signin');
       return;
     }
-    const response = await axios.get(`${api.baseURL}/expenses`, {
+    const response = await axios.get('/expenses', {
       headers: { Authorization: `Bearer ${authToken}`, Accept: 'application/json' },
     });
     expenses.value = response.data;

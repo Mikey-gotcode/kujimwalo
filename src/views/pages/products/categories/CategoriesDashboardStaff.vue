@@ -124,7 +124,7 @@ const error = ref(null);
         router.push('/signin');
         return;
       }
-      const response = await axios.get(`${api.baseURL}/category`, {
+      const response = await axios.get('/category', {
         headers: {
           Authorization: `Bearer ${authToken}`, // Ensure the correct format
           Accept: 'application/json', // Sometimes required for Laravel-based APIs
@@ -190,7 +190,7 @@ const error = ref(null);
         router.push('/signin');
         return;
       }
-      const orderResponse = await axios.post(`${api.baseURL}/orders`, {
+      const orderResponse = await axios.post('/orders', {
         headers: {
           Authorization: `Bearer ${authToken}`, // Ensure the correct format
           Accept: 'application/json', // Sometimes required for Laravel-based APIs
@@ -200,7 +200,7 @@ const error = ref(null);
       const orderId = orderResponse.data.id;
       
       for (const item of cart.value) {
-        await axios.post(`${api.baseURL}/order_items/`, {
+        await axios.post('/order_items/', {
         headers: {
           Authorization: `Bearer ${authToken}`, // Ensure the correct format
           Accept: 'application/json', // Sometimes required for Laravel-based APIs

@@ -88,7 +88,7 @@ const submitForm = async () => {
       return;
       }
       //console.log("form data:", formData);
-      const response = await axios.post(`${api.baseURL}/products`,  formData,{
+      const response = await axios.post('/products',  formData,{
       headers: {
         Authorization: `Bearer ${authToken}`, // Ensure the correct format
         Accept: 'application/json', // Sometimes required for Laravel-based APIs
@@ -124,7 +124,7 @@ const fetchCategories = async () => {
       return;
       }
    try {
-      const response = await axios.get(`${api.baseURL}/category` ,{
+      const response = await axios.get('/category' ,{
       headers: {
         Authorization: `Bearer ${authToken}`, // Ensure the correct format
         Accept: 'application/json', // Sometimes required for Laravel-based APIs

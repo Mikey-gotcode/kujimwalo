@@ -69,8 +69,8 @@ const theme = inject("theme")
             router.push('/signin');
             return;
          }
-       //console.log("form data:", formData);
-       const response = await axios.post(`${api.baseURL}/category`,formData,{
+       
+       const response = await axios.post('/category',formData,{
          headers: {
          Authorization: `Bearer ${authToken}`, // Ensure the correct format
          Accept: 'application/json', // Sometimes required for Laravel-based APIs

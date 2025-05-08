@@ -147,9 +147,9 @@ const profileImageUrl = ref(null);
 const fetchUserProfile = async () => {
   try {
     const authToken = authStore.token;
-    //const userId = authStore.user.id;
 
-    const response = await axios.get(`${api.baseURL}/users/`, { // Correct API endpoint
+
+    const response = await axios.get('/users/', { // Correct API endpoint
       headers: {
         Authorization: `Bearer ${authToken}`,
         Accept: 'application/json',
@@ -204,7 +204,7 @@ const saveProfile = async () => {
     const authToken = authStore.token;
     const userId = authStore.user.id;
 
-    const response = await axios.post(`${api.baseURL}/users/${userId}/profile`, formData, { // Correct API endpoint
+    const response = await axios.post(`/users/${userId}/profile`, formData, { // Correct API endpoint
       headers: {
         'Content-Type': 'multipart/form-data',
         Authorization: `Bearer ${authToken}`,

@@ -120,7 +120,7 @@ const submitForm = async () => {
             return;
         }
 
-        const response = await axios.post(`${api.baseURL}/orders/${props.orderID}/process-payment`, 
+        const response = await axios.post(`/orders/${props.orderID}/process-payment`, 
         {
             amount: amount.value,
             payment_method: props.paymentMethod

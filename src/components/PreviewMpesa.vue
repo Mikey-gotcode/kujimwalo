@@ -115,7 +115,7 @@ const startPolling = (checkoutRequestId) => {
     pollingStartTime = Date.now();
     pollingIntervalId = setInterval(async () => {
         try {
-            const response = await axios.get(`${api.baseURL}/mpesa/stk/status/${checkoutRequestId}`, {
+            const response = await axios.get(`/mpesa/stk/status/${checkoutRequestId}`, {
                 headers: {
                     Authorization: `Bearer ${authStore.token}`,
                     Accept: 'application/json'
@@ -201,7 +201,7 @@ const submitForm = async () => {
             return;
         }
 
-        const response = await axios.post(`${api.baseURL}/mpesa/stkpush`, {
+        const response = await axios.post('/mpesa/stkpush', {
             amount: parseInt(amount.value),
             phone: phone.value,
             account_number: '12345',

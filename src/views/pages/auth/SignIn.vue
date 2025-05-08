@@ -98,7 +98,7 @@ const submitForm = async () => {
   errorMessage.value = ""; // Reset error message before submission
   isLoading.value=true //start loading effect
   try {
-    const response = await axios.post(`${api.baseURL}/login`, form, {
+    const response = await axios.post('/login', form, {
       headers: {
         "Content-Type": "application/json",
         "Accept": "application/json"

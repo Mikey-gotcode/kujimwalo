@@ -31,7 +31,7 @@ const fetchExpenses = async () => {
       router.push('/signin');
       return;
     }
-    const response = await axios.get(`${api.baseURL}/expenses`, {
+    const response = await axios.get('/expenses', {
       headers: { Authorization: `Bearer ${authToken}`, Accept: 'application/json' },
     });
     expenses.value = response.data;
@@ -54,7 +54,7 @@ const closeEditModal = () => {
 
 const updateExpense = async () => {
   try {
-    await axios.put(`${api.baseURL}/expenses/${editingExpense.value.id}`, editingExpense.value, {
+    await axios.put(`/expenses/${editingExpense.value.id}`, editingExpense.value, {
       headers: { Authorization: `Bearer ${authStore.token}` },
     });
     fetchExpenses();
@@ -66,7 +66,7 @@ const updateExpense = async () => {
 
 const deleteExpense = async (id) => {
   try {
-    await axios.delete(`${api.baseURL}/expenses/${id}`, {
+    await axios.delete(`/expenses/${id}`, {
       headers: { Authorization: `Bearer ${authStore.token}` },
     });
     expenses.value = expenses.value.filter(expense => expense.id !== id);

@@ -125,7 +125,7 @@ isLoading.value=true //start loading
 
 try {
   const authStore =useAuthStore()
-  const response = await axios.post(`${api.baseURL}/register`, form);
+  const response = await axios.post('/register', form);
   console.log("Login successful:", response.data);
   await authStore.login(form, router);
   // Handle success (e.g., store token, redirect)
