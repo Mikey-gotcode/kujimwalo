@@ -28,16 +28,12 @@ const isInStock = (product) => product.stock_quantity > 0;
 
 const activeImageIndex = ref({});
 
-const getImageUrl = (product) => {
-  console.log('API Object in getImageUrl:', api); // Debugging
-  if (!api || !api.baseURL) {
-    console.error('api or api.baseURL is undefined!');
-    return 'default-image.jpg'; // Prevent further errors
-  }
-  if (!product.images.length) return 'default-image.jpg';
+function getImageUrl(product) {
+  if (!product.images.length) return '/default-image.jpg';
   const idx = activeImageIndex.value[product.id] || 0;
-  return `${api.baseURL}/${product.images[idx].image_path}`;
-};
+  return `${api.defaults.baseURL}/${product.images[idx].image_path}`;
+}
+
 
 const prevImage = (productId) => {
   const idx = activeImageIndex.value[productId] || 0;
@@ -135,7 +131,7 @@ watch(() => props.activeTab, loadProducts);
         <!-- Image Carousel -->
         <div class="relative overflow-hidden w-full aspect-[4/3]">
           <img
-            :src="getImageUrl(product,api.baseURL)"
+            :src="getImageUrl(product)"
             :alt="product.name"
             class="w-full h-full object-cover rounded-lg"
           />

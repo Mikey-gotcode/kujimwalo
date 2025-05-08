@@ -25,15 +25,12 @@
   
   const isInStock = (product) => product.stock_quantity > 0;
   
-  const getImageUrl = computed(() => (product) => {
-    if (!api || !api.baseURL) {
-      console.error('api or api.baseURL is undefined in computed!');
-      return 'default-image.jpg';
-    }
-    if (!product.images.length) return 'default-image.jpg';
-    const idx = activeImageIndex.value[product.id] || 0;
-    return `${api.baseURL}/${product.images[idx].image_path}`;
-  });
+  const getImageUrl = (product) => {
+  if (!product.images.length) return '/default-image.jpg';
+  const idx = activeImageIndex.value[product.id] || 0;
+  return `${api.defaults.baseURL}/${product.images[idx].image_path}`;
+};
+
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file && file.size <= 5 * 1024 * 1024) imageFile.value = file;
