@@ -4,6 +4,8 @@
   import api from '../../../../api';
   import { useAuthStore } from '../../../../store/auth';
   import { useRouter } from 'vue-router';
+
+  console.log('API Object in Component:', api);
   
   const props = defineProps({ activeTab: Number });
   const products = ref([]);

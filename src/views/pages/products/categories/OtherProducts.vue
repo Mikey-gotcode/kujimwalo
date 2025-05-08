@@ -6,6 +6,8 @@ import { useAuthStore } from '../../../../store/auth';
 import { useCartStore } from '../../../../store/cart';
 import { useRouter } from 'vue-router';
 
+console.log('API Object in Component:', api);
+
 const props = defineProps({ activeTab: Number });
 const products = ref([]);
 const allProducts = ref([]);
@@ -26,15 +28,16 @@ const isInStock = (product) => product.stock_quantity > 0;
 
 const activeImageIndex = ref({});
 
-const getImageUrl = computed(() => (product) => {
+const getImageUrl = (product) => {
+  console.log('API Object in getImageUrl:', api); // Debugging
   if (!api || !api.baseURL) {
-    console.error('api or api.baseURL is undefined in computed!');
-    return 'default-image.jpg';
+    console.error('api or api.baseURL is undefined!');
+    return 'default-image.jpg'; // Prevent further errors
   }
   if (!product.images.length) return 'default-image.jpg';
   const idx = activeImageIndex.value[product.id] || 0;
-  return `<span class="math-inline">\{api\.baseURL\}/</span>{product.images[idx].image_path}`;
-});
+  return `${api.baseURL}/${product.images[idx].image_path}`;
+};
 
 const prevImage = (productId) => {
   const idx = activeImageIndex.value[productId] || 0;
