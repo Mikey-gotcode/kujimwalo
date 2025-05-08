@@ -17,7 +17,7 @@
       <div class="overflow-hidden w-full mt-2">
         <h1 ref="typedRef" class="text-xl sm:text-2xl md:text-3xl font-light text-white"></h1>
       </div>
-      <router-link to="/signin">
+      <router-link to="/customer/categories-dashboard">
         <button class="mt-6 px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold text-lg rounded-lg shadow-lg transition">
           Buy Now
         </button>

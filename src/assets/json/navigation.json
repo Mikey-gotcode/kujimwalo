@@ -1,9 +1,9 @@
 {
     "brand": {
-      "name": "KUJIMWALO",
+      "name": "VINS COLLECTIONS",
       "logo": {
-        "light": "../../../public/kujimwalo.svg",
-        "dark": "../../../public/kujimwalo.svg"
+        "light": "../../../public/kujimwalo(1).svg",
+        "dark": "../../../public/kujimwalo(1).svg"
       },
       "link": "/"
     },
@@ -19,11 +19,8 @@
       {
         "name": "Today's Deals",
         "link": "/deals"
-      },
-      {
-        "name": "Sell",
-        "link": "/sell"
       }
+     
     ],
     "cart": {
       "label": "My Cart",

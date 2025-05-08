@@ -20,10 +20,10 @@ onMounted(() => {
         <!-- Brand -->
         <div class="flex items-center w-full lg:w-auto justify-between">
           <router-link v-if="navigation?.brand?.link" :to="navigation.brand.link" class="flex items-center text-lg">
-            <img class="block w-auto h-8 dark:hidden" :src="navigation?.brand.logo.light" alt="Logo">
-            <img class="hidden w-auto h-8 dark:block" :src="navigation?.brand.logo.dark" alt="Logo">
+            <img class="block w-auto h-12 dark:hidden" :src="navigation?.brand.logo.light" alt="Logo">
+            <img class="hidden w-auto h-12 dark:block" :src="navigation?.brand.logo.dark" alt="Logo">
             <span :class="{ 'text-black': theme === 'light', 'text-gray-200': theme === 'dark' }"
-                  class="ml-2 font-semibold">{{ navigation?.brand.name }}</span>
+                  class="ml-2 font-semibold text-lg">{{ navigation?.brand.name }}</span>
           </router-link>
           
           <!-- Mobile Menu Button -->
@@ -37,7 +37,7 @@ onMounted(() => {
         <!-- Desktop Navigation -->
         <ul class="hidden lg:flex items-center gap-6 py-3 md:pr-4">
           <li v-for="item in navigation?.menuItems" :key="item.name">
-            <router-link :to="item.link" class="text-sm font-medium  hover:text-primary-700 dark:hover:text-primary-500" :class="theme">
+            <router-link :to="item.link" class="text-sm font-medium  hover:text-primary-700 dark:hover:text-primary-500 box-decorations-none" :class="theme" >
               {{ item.name }}
             </router-link>
           </li>
