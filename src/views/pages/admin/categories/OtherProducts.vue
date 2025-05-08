@@ -149,7 +149,7 @@ const isInStock = (product) => product.stock_quantity > 0;
 const getImageUrl = (product) => {
   if (!product.images.length) return 'default-image.jpg';
   const idx = activeImageIndex.value[product.id] || 0;
-  return `${api.baseURL}${product.images[idx].image_path}`;
+  return `${api.baseURL}/${product.images[idx].image_path}`;
 };
 
 const handleImageUpload = (e) => {
