@@ -343,7 +343,7 @@ import AdminLayout from './AdminLayout.vue';
 
 import { ref, onMounted } from 'vue';
 
-import axios from 'axios';
+//import axios from 'axios';
 
 import { useAuthStore } from '../../../store/auth';
 
@@ -384,7 +384,7 @@ const fetchUsers = async () => {
 
     try {
 
-        const response = await axios.get('/users', {
+        const response = await api.get('/users', {
 
             headers: {
 
@@ -438,7 +438,7 @@ const fetchFilteredUsers = async () => {
         }
 
 
-        const response = await axios.get(`/users/search?${params.toString()}`, {
+        const response = await api.get(`/users/search?${params.toString()}`, {
 
             headers: {
 
@@ -469,7 +469,7 @@ const createUser = async () => {
 
     try {
 
-        const response = await axios.post('/register', newUser.value, {
+        const response = await api.post('/register', newUser.value, {
 
             headers: {
 

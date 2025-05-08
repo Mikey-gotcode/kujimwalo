@@ -104,7 +104,7 @@
 
 <script setup>
 import { ref, inject } from "vue";
-import axios from "axios";
+//import axios from "axios";
 import api from "../../../api";
 import { useAuthStore } from "../../../store/auth";
 
@@ -131,7 +131,7 @@ const changePassword = async () => {
     }
 
     try {
-        const response = await axios.post('/change-password', {
+        const response = await api.post('/change-password', {
             current_password: currentPassword.value,
             new_password: newPassword.value,
             new_password_confirmation: confirmPassword.value // Correct field name!
@@ -154,7 +154,7 @@ const changePassword = async () => {
 // Log Out Other Sessions
 const logoutSessions = async () => {
     try {
-        const response = await axios.post('/logout-other-sessions', {
+        const response = await api.post('/logout-other-sessions', {
             password: logoutPassword.value
         }, {
          headers: {
@@ -176,7 +176,7 @@ const confirmDelete = () => {
 // Delete Account
 const deleteAccount = async () => {
     try {
-        const response = await axios.post('/delete-account', {
+        const response = await api.post('/delete-account', {
             password: deletePassword.value
         }, { 
         headers: {

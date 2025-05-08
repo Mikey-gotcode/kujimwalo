@@ -52,7 +52,7 @@
 
 <script setup>
 import { ref, reactive, defineProps, defineEmits, onMounted, inject } from 'vue';
-import axios from 'axios';
+//import axios from 'axios';
 import api from '../../../../api';
 import { useAuthStore } from '../../../../store/auth';
 import {useRouter} from 'vue-router'
@@ -88,7 +88,7 @@ const submitForm = async () => {
       return;
       }
       //console.log("form data:", formData);
-      const response = await axios.post('/products',  formData,{
+      const response = await api.post('/products',  formData,{
       headers: {
         Authorization: `Bearer ${authToken}`, // Ensure the correct format
         Accept: 'application/json', // Sometimes required for Laravel-based APIs
@@ -124,7 +124,7 @@ const fetchCategories = async () => {
       return;
       }
    try {
-      const response = await axios.get('/category' ,{
+      const response = await api.get('/category' ,{
       headers: {
         Authorization: `Bearer ${authToken}`, // Ensure the correct format
         Accept: 'application/json', // Sometimes required for Laravel-based APIs

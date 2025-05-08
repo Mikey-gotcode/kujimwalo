@@ -170,7 +170,7 @@
 
 <script setup>
 import { ref, onBeforeMount, watch, defineProps, nextTick, inject, computed } from 'vue';
-import axios from 'axios';
+//import axios from 'axios';
 import api from '../../../../api';
 import { useAuthStore } from '../../../../store/auth';
 import { useCartStore } from '../../../../store/cart';
@@ -241,7 +241,7 @@ const checkout = async () => {
     items: cart.value.map(i => ({ product_id: i.id, quantity: i.quantity }))
   };
   try {
-    await axios.post('/orders', payload, {
+    await api.post('/orders', payload, {
       headers: { Authorization: `Bearer ${authStore.token}`, Accept: 'application/json', 'Content-Type': 'application/json' },
       withCredentials: true
     });
@@ -256,7 +256,7 @@ const loadProducts = async () => {
   loading.value = true; error.value = null;
   //if (!authStore.token) return router.push('/signin');
   try {
-    const res = await axios.get('/products', { headers: { Authorization: `Bearer ${authStore.token}`, Accept: 'application/json' }, withCredentials: true });
+    const res = await api.get('/products', { headers: { Authorization: `Bearer ${authStore.token}`, Accept: 'application/json' }, withCredentials: true });
     allProducts.value = Array.isArray(res.data) ? res.data : [];
     products.value = props.activeTab ? allProducts.value.filter(p => p.category_id === props.activeTab) : allProducts.value;
     products.value.forEach(p => { quantities.value[p.id] = quantities.value[p.id] || 0; activeImageIndex.value[p.id] = 0; });

@@ -74,7 +74,7 @@
 
 <script setup>
 import { ref, onMounted, computed, nextTick, inject } from 'vue';
-import axios from 'axios';
+//import axios from 'axios';
 import api from '../../../../api';
 import ProductNav from '../ProductNav.vue';
 import CategoriesSide from '../categories/CategoriesSide.vue';
@@ -108,7 +108,7 @@ const fetchCategories = async () => {
   try {
     const authToken = authStore.token;
 
-    const response = await axios.get('/category', {
+    const response = await api.get('/category', {
       headers: {
         Authorization: `Bearer ${authToken}`,
         Accept: 'application/json',
@@ -175,7 +175,7 @@ const checkout = async () => {
       router.push('/signin');
       return;
     }
-    const orderResponse = await axios.post('/orders', {
+    const orderResponse = await api.post('/orders', {
       headers: {
         Authorization: `Bearer ${authToken}`, // Ensure the correct format
         Accept: 'application/json', // Sometimes required for Laravel-based APIs
@@ -185,7 +185,7 @@ const checkout = async () => {
     const orderId = orderResponse.data.id;
     
     for (const item of cart.value) {
-      await axios.post('/order_items/', {
+      await api.post('/order_items/', {
       headers: {
         Authorization: `Bearer ${authToken}`, // Ensure the correct format
         Accept: 'application/json', // Sometimes required for Laravel-based APIs

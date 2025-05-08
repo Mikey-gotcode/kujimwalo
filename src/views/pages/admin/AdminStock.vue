@@ -95,7 +95,7 @@
 
 <script setup>
 import { ref, onMounted, watch, computed, nextTick, inject } from 'vue';
-import axios from 'axios';
+//import axios from 'axios';
 import api from '../../../api';
 import AdminLayout from './AdminLayout.vue';
 import OtherProducts from '../admin/categories/OtherProducts.vue';
@@ -157,7 +157,7 @@ const fetchCategories = async () => {
       router.push('/signin');
       return;
     }
-    const response = await axios.get('/category', {
+    const response = await api.get('/category', {
       headers: {
         Authorization: `Bearer ${authToken}`, // Ensure the correct format
         Accept: 'application/json', // Sometimes required for Laravel-based APIs

@@ -51,7 +51,7 @@
 import { onMounted, ref } from "vue";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import axios from 'axios';
+//import axios from 'axios';
 import api from '../../../api';
 import AutoCounter from 'vue3-autocounter';
 
@@ -71,7 +71,7 @@ const services = ref([
 
 const fetchCounterData = async () => {
   try {
-    const { data } = await axios.get('/order-counts');
+    const { data } = await api.get('/order-counts');
     console.log("API Response Data:", data);
 
     receivedOrdersCount.value = data.received_orders;

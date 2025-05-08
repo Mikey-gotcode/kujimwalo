@@ -56,7 +56,7 @@
   
   <script setup>
   import { ref, onMounted, inject } from "vue";
-  import axios from "axios";
+  //import axios from "axios";
   import { useAuthStore } from "../../../../store/auth";
 import {useRouter} from 'vue-router'
 import api from "../../../../api";
@@ -81,7 +81,7 @@ const router = useRouter()
         router.push('/signin');
         return;
         }
-      const response = await axios.get('/user/', {
+      const response = await api.get('/user/', {
       headers: {
         Authorization: `Bearer ${authToken}`,
         Accept: 'application/json',

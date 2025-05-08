@@ -130,7 +130,7 @@
 import { ref, inject, onMounted } from 'vue';
 import Modal from './Modal.vue';
 import { useAuthStore } from '../../../store/auth';
-import axios from 'axios';
+//import axios from 'axios';
 import api from '../../../api'; // Assuming you have your API base URL defined here
 
 const authStore = useAuthStore();
@@ -149,7 +149,7 @@ const fetchUserProfile = async () => {
     const authToken = authStore.token;
 
 
-    const response = await axios.get('/users/', { // Correct API endpoint
+    const response = await api.get('/users/', { // Correct API endpoint
       headers: {
         Authorization: `Bearer ${authToken}`,
         Accept: 'application/json',
@@ -204,7 +204,7 @@ const saveProfile = async () => {
     const authToken = authStore.token;
     const userId = authStore.user.id;
 
-    const response = await axios.post(`/users/${userId}/profile`, formData, { // Correct API endpoint
+    const response = await api.post(`/users/${userId}/profile`, formData, { // Correct API endpoint
       headers: {
         'Content-Type': 'multipart/form-data',
         Authorization: `Bearer ${authToken}`,

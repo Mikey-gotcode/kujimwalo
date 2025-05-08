@@ -35,7 +35,7 @@
  
  <script setup>
  import { ref, reactive, defineProps, defineEmits, inject } from 'vue';
- import axios from 'axios';
+ //import axios from 'axios';
  import api from '../../../../api';
 import { useAuthStore } from '../../../../store/auth';
 import {useRouter} from 'vue-router'
@@ -70,7 +70,7 @@ const theme = inject("theme")
             return;
          }
        
-       const response = await axios.post('/category',formData,{
+       const response = await api.post('/category',formData,{
          headers: {
          Authorization: `Bearer ${authToken}`, // Ensure the correct format
          Accept: 'application/json', // Sometimes required for Laravel-based APIs

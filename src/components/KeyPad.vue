@@ -67,7 +67,7 @@
 
 <script setup>
 import { ref, watch, defineProps, defineEmits } from 'vue';
-import axios from 'axios';
+//import axios from 'axios';
 import api from '../api';
 import { useAuthStore } from '../store/auth';
 import { useRouter } from 'vue-router';
@@ -120,7 +120,7 @@ const submitForm = async () => {
             return;
         }
 
-        const response = await axios.post(`/orders/${props.orderID}/process-payment`, 
+        const response = await api.post(`/orders/${props.orderID}/process-payment`, 
         {
             amount: amount.value,
             payment_method: props.paymentMethod

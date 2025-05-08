@@ -98,7 +98,7 @@
 <script setup>
 import { reactive, ref } from "vue";
 import { useAuthStore } from "../../../store/auth";
-import axios from "axios";
+//import axios from "axios";
 import { useRouter } from "vue-router";
 import api from "../../../api"; // Import the API configuration
 
@@ -125,7 +125,7 @@ isLoading.value=true //start loading
 
 try {
   const authStore =useAuthStore()
-  const response = await axios.post('/register', form);
+  const response = await api.post('/register', form);
   console.log("Login successful:", response.data);
   await authStore.login(form, router);
   // Handle success (e.g., store token, redirect)

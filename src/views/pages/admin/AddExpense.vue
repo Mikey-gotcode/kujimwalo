@@ -39,7 +39,7 @@
  
  <script setup>
  import { ref, reactive, defineProps, defineEmits, inject } from 'vue';
- import axios from 'axios';
+ //import axios from 'axios';
  import api from '../../../api';
 import { useAuthStore } from '../../../store/auth';
 import {useRouter} from 'vue-router'
@@ -82,7 +82,7 @@ const expenses = ref([]);
             return;
          }
       
-       const response = await axios.post('/expenses',formData,{
+       const response = await api.post('/expenses',formData,{
          headers: {
          Authorization: `Bearer ${authToken}`, // Ensure the correct format
          Accept: 'application/json', // Sometimes required for Laravel-based APIs
@@ -121,7 +121,7 @@ const expenses = ref([]);
       router.push('/signin');
       return;
     }
-    const response = await axios.get('/expenses', {
+    const response = await api.get('/expenses', {
       headers: { Authorization: `Bearer ${authToken}`, Accept: 'application/json' },
     });
     expenses.value = response.data;

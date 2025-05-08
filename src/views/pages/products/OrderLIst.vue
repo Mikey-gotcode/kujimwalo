@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted, defineProps, inject, computed, watch } from 'vue';
-import axios from 'axios';
+//import axios from 'axios';
 import api from '../../../api';
 //import KeyPad from '../../../components/KeyPad.vue';
 import PreviewMpesa from '../../../components/PreviewMpesa.vue';
@@ -48,7 +48,7 @@ const fetchOrders = async () => {
       router.push('/signin');
       return;
     }
-    const response = await axios.get(`/orders/${authStore.user.id}`, {
+    const response = await api.get(`/orders/${authStore.user.id}`, {
       headers: { Authorization: `Bearer ${authToken}`, Accept: 'application/json' },
       withCredentials: true,
     });
@@ -113,7 +113,7 @@ const cancelOrder = async (id) => {
       router.push('/signin');
       return;
     }
-    await axios.post(`/orders/${id}/cancel`, null, {
+    await api.post(`/orders/${id}/cancel`, null, {
       headers: { Authorization: `Bearer ${authToken}`, Accept: 'application/json' },
       withCredentials: true,
     });

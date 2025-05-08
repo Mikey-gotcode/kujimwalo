@@ -77,7 +77,7 @@
   <script setup>
 import { reactive ,ref } from 'vue';
 import { useAuthStore } from '../../../store/auth';
-import axios from 'axios';
+//import axios from 'axios';
 import api from "../../../api"; // Import the API configuration
 import { useRouter } from 'vue-router'; // Import router
 
@@ -98,7 +98,7 @@ const submitForm = async () => {
   errorMessage.value = ""; // Reset error message before submission
   isLoading.value=true //start loading effect
   try {
-    const response = await axios.post('/login', form, {
+    const response = await api.post('/login', form, {
       headers: {
         "Content-Type": "application/json",
         "Accept": "application/json"

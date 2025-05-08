@@ -123,7 +123,7 @@
 
 <script setup>
 import { ref, onBeforeMount, watch, defineProps, computed, inject } from 'vue';
-import axios from 'axios';
+//import axios from 'axios';
 import api from '../../../../api';
 import { useAuthStore } from '../../../../store/auth';
 import { useRouter } from 'vue-router';
@@ -188,7 +188,7 @@ const saveChanges = async () => {
     form.append('_method', 'PATCH');
     if (imageFile.value) form.append('images[]', imageFile.value);
 
-    await axios.post(url, form, {
+    await api.post(url, form, {
       headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
       withCredentials: true,
     });
@@ -207,7 +207,7 @@ const confirmDelete = async (id) => {
   if (!confirm('Are you sure?')) return;
   try {
     const token = authStore.token;
-    await axios.delete(`/products/${id}`, {
+    await api.delete(`/products/${id}`, {
       headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
       withCredentials: true,
     });
@@ -230,7 +230,7 @@ const loadProducts = async () => {
     const token = authStore.token;
     if (!token) { router.push('/signin'); return; }
 
-    const res = await axios.get('/products', {
+    const res = await api.get('/products', {
       headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
       withCredentials: true,
     });

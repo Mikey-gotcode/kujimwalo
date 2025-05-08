@@ -196,7 +196,7 @@ const formatDate = (dateString) => new Date(dateString).toLocaleDateString();
       return;
     }
 
-    const response = await axios.get('/orders', {
+    const response = await api.get('/orders', {
       headers: {
         Authorization: `Bearer ${authToken}`,
         Accept: 'application/json',
@@ -227,7 +227,7 @@ const refreshOrders = async () => {
     const authToken = authStore.token;
     if (!authToken) return;
 
-    const response = await axios.get('/orders', {
+    const response = await api.get('/orders', {
       headers: {
         Authorization: `Bearer ${authToken}`,
         Accept: 'application/json',
@@ -297,7 +297,7 @@ const cancelOrder = async (id) => {
       router.push('/signin');
       return;
     }
-    await axios.post(`/orders/${id}/cancel`, {}, {
+    await api.post(`/orders/${id}/cancel`, {}, {
       headers: {
         Authorization: `Bearer ${authToken}`,
         Accept: 'application/json',

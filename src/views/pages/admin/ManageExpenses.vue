@@ -2,7 +2,7 @@
 import AdminLayout from './AdminLayout.vue';
 import AddExpense from './AddExpense.vue'
 import { ref, onMounted, computed, inject } from 'vue';
-import axios from 'axios';
+//import axios from 'axios';
 import api from '../../../api';
 import { useAuthStore } from '../../../store/auth';
 import { useRouter } from 'vue-router';
@@ -31,7 +31,7 @@ const fetchExpenses = async () => {
       router.push('/signin');
       return;
     }
-    const response = await axios.get('/expenses', {
+    const response = await api.get('/expenses', {
       headers: { Authorization: `Bearer ${authToken}`, Accept: 'application/json' },
     });
     expenses.value = response.data;
@@ -54,7 +54,7 @@ const closeEditModal = () => {
 
 const updateExpense = async () => {
   try {
-    await axios.put(`/expenses/${editingExpense.value.id}`, editingExpense.value, {
+    await api.put(`/expenses/${editingExpense.value.id}`, editingExpense.value, {
       headers: { Authorization: `Bearer ${authStore.token}` },
     });
     fetchExpenses();
@@ -66,7 +66,7 @@ const updateExpense = async () => {
 
 const deleteExpense = async (id) => {
   try {
-    await axios.delete(`/expenses/${id}`, {
+    await api.delete(`/expenses/${id}`, {
       headers: { Authorization: `Bearer ${authStore.token}` },
     });
     expenses.value = expenses.value.filter(expense => expense.id !== id);
